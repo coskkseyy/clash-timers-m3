@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material You widget palette. v31: wallpaper-driven system colors; below 12: static M3 baseline. -->
+<resources>
+    <color name="m_panel">@android:color/system_neutral1_50</color>
+    <color name="m_track">@android:color/system_accent2_100</color>
+    <color name="m_fill">@android:color/system_accent1_200</color>
+    <color name="m_done">@android:color/system_accent3_100</color>
+    <color name="m_on">@android:color/system_neutral1_900</color>
+    <color name="m_sub">@android:color/system_neutral2_700</color>
+    <color name="m_primary">@android:color/system_accent1_600</color>
+    <color name="m_on_primary">@android:color/system_accent1_0</color>
+    <color name="m_pill">@android:color/system_accent2_100</color>
+    <color name="m_on_pill">@android:color/system_accent2_900</color>
+    <color name="m_pill_on">@android:color/system_accent1_100</color>
+    <color name="m_tertiary">@android:color/system_accent3_600</color>
+    <color name="m_tert_cont">@android:color/system_accent3_100</color>
+    <color name="m_on_tert_cont">@android:color/system_accent3_900</color>
+    <color name="m_outline">@android:color/system_neutral2_200</color>
+    <color name="m_error">#FFB3261E</color>
+    <dimen name="m_panel_radius">@android:dimen/system_app_widget_background_radius</dimen>
+</resources>

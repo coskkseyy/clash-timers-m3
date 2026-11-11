@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material You widget palette. v31: wallpaper-driven system colors; below 12: static M3 baseline. -->
+<resources>
+    <color name="m_panel">#FFF7F2FA</color>
+    <color name="m_track">#FFE7E0EC</color>
+    <color name="m_fill">#FFD0BCFF</color>
+    <color name="m_done">#FFFFD8E4</color>
+    <color name="m_on">#FF1D1B20</color>
+    <color name="m_sub">#FF49454F</color>
+    <color name="m_primary">#FF6750A4</color>
+    <color name="m_on_primary">#FFFFFFFF</color>
+    <color name="m_pill">#FFE8DEF8</color>
+    <color name="m_on_pill">#FF1D192B</color>
+    <color name="m_pill_on">#FFEADDFF</color>
+    <color name="m_tertiary">#FF7D5260</color>
+    <color name="m_tert_cont">#FFFFD8E4</color>
+    <color name="m_on_tert_cont">#FF31111D</color>
+    <color name="m_outline">#FFCAC4D0</color>
+    <color name="m_error">#FFB3261E</color>
+    <dimen name="m_panel_radius">24dp</dimen>
+</resources>
