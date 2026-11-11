@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Themed (Material You) icon: the stopwatch outline + hammer in one color -->
+<!-- Themed (Material You) icon: the same clock in one color -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#FFFFFFFF" android:pathData="M50,25h8v7h-2v4h-4v-4h-2z" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2.5" android:strokeLineCap="round" android:pathData="M68.5,43.5L71,41" />
-    <path android:fillColor="#FFFFFFFF" android:pathData="M69.5,38.5l3,-3l3,3l-3,3z" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:pathData="M54,37.5a20.5,20.5 0,1 1,0 41a20.5,20.5 0,1 1,0 -41z" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round"
-        android:pathData="M54,44.5v3M54,68.5v3M40.5,58h3M64.5,58h3" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M47,66L60,53" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="7.5" android:strokeLineCap="round" android:pathData="M56.2,47.2L66.8,57.8" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="5"
+        android:pathData="M54,32a22,22 0,1 1,0 44a22,22 0,1 1,0 -44z" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:fillColor="#00000000" android:pathData="M54,42V54L62,59" />
 </vector>
