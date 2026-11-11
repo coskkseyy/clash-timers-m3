@@ -13,14 +13,14 @@ object SyncLogic {
     fun apply(old: AppState, clipboard: String?): Outcome {
         fun fail(reason: String) = Outcome.Failed(old.copy(syncFailed = true), reason)
 
-        if (clipboard.isNullOrBlank()) return fail("Clipboard is empty")
+        if (clipboard.isNullOrBlank()) return fail(Lang.t("Clipboard is empty", "Pano boş"))
         val export = when (val r = ExportParser.parse(clipboard)) {
-            is ParseResult.Invalid -> return fail("Not village data: ${r.reason}")
+            is ParseResult.Invalid -> return fail(Lang.t("Not village data: ", "Köy verisi değil: ") + r.reason)
             is ParseResult.Success -> r.export
         }
         val previous = old.export
         if (previous != null && export.timestamp < previous.timestamp) {
-            return fail("Clipboard export is older than the last sync")
+            return fail(Lang.t("Clipboard export is older than the last sync", "Panodaki veri son sync'ten eski"))
         }
 
         val links = HelperLinks(
@@ -78,17 +78,17 @@ object SyncLogic {
 
 /** Plain-text summary of a sync outcome for the toast and the launcher screen. */
 fun SyncLogic.Outcome.describe(names: NameMap): String = when (this) {
-    is SyncLogic.Outcome.Failed -> "Sync failed: $reason"
+    is SyncLogic.Outcome.Failed -> Lang.t("Sync failed: ", "Sync olmadı: ") + reason
     is SyncLogic.Outcome.Synced -> buildString {
         val e = export
-        append("Synced")
+        append(Lang.t("Synced", "Sync tamam"))
         e.townHallLevel?.let { append(" TH$it") }
         val goblin = e.builderJobs.count { it.isGoblin }
-        append(" · ${e.regularBuilderJobs.size} builder job")
-        if (e.regularBuilderJobs.size != 1) append("s")
+        append(" · ${e.regularBuilderJobs.size} " + Lang.t("builder job", "inşaat"))
+        if (e.regularBuilderJobs.size != 1 && !Lang.tr) append("s")
         if (goblin > 0) append(" + Goblin")
-        append(" · lab: ").append(e.labJob?.let(names::label) ?: "idle")
-        append(" · pet: ").append(e.petJob?.let(names::label) ?: "idle")
-        e.builderBoostRemaining?.let { append(" · builder potion ${WidgetModelBuilder.formatRemaining(it)} left") }
+        append(" · " + Lang.t("lab", "lab") + ": ").append(e.labJob?.let(names::label) ?: Lang.t("idle", "boşta"))
+        append(" · " + Lang.t("pet", "pet") + ": ").append(e.petJob?.let(names::label) ?: Lang.t("idle", "boşta"))
+        e.builderBoostRemaining?.let { append(Lang.t(" · builder potion ${WidgetModelBuilder.formatRemaining(it)} left", " · inşaat iksiri ${WidgetModelBuilder.formatRemaining(it)} kaldı")) }
     }
 }

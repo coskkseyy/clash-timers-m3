@@ -12,8 +12,12 @@ data class BbModel(
     val buildersTotal: Int,
     val builderRows: List<WidgetRow>,
     val labRow: WidgetRow,
-    /** `Clock Tower 12m` while the boost runs, else empty. */
+    /** Clock Tower: `running 12m` / `ready` / `in 5h 20m`. */
     val footerLeft: String,
+    /** The free Clock Tower boost can be used now (shown highlighted). */
+    val clockTowerReady: Boolean = false,
+    /** Epoch s when the Clock Tower line next changes state (boost ends / becomes ready), or null. */
+    val nextChangeAt: Long? = null,
     val footerRight: String,
     val syncFailed: Boolean,
 ) {
@@ -42,7 +46,7 @@ object BuilderBase {
     fun build(state: AppState, settings: AppSettings, names: NameMap, times: UpgradeTimes, now: Long): BbModel {
         val export = state.export
         val idleLab = WidgetRow(
-            kind = RowKind.IDLE, name = "Star Laboratory", levelText = null, showArrow = false,
+            kind = RowKind.IDLE, name = Lang.t("Star Laboratory", "Yıldız Laboratuvarı"), levelText = null, showArrow = false,
             iconIds = listOf(GameIds.STAR_LABORATORY), initials = "SL", finishAt = null, remaining = 0,
             progress = 1f, button = RowButton.NONE,
         )
@@ -84,6 +88,15 @@ object BuilderBase {
         val busy = builderRows.count { it.kind == RowKind.RUNNING }
         val total = maxOf(busy, 1 + if (export.hasOttosOutpost) 1 else 0)
         val boostLeft = (t0 + boost - now).coerceAtLeast(0)
+        val readyAt = t0 + (export.clockTowerCooldown ?: 0L)
+        val readyIn = readyAt - now
+        val clock = Lang.t("Clock Tower", "Saat Kulesi")
+        val footer = when {
+            boostLeft > 0 -> "$clock " + Lang.t("running ", "çalışıyor ") + WidgetModelBuilder.formatRemaining(boostLeft)
+            readyIn <= 0 -> "$clock " + Lang.t("ready", "hazır")
+            else -> "$clock " + Lang.t("in ", "") + WidgetModelBuilder.formatRemaining(readyIn) + Lang.t("", " sonra")
+        }
+        val nextChange = listOf(t0 + boost, readyAt).filter { it > now }.minOrNull()
         return BbModel(
             hasData = true,
             playerName = settings.displayName,
@@ -92,7 +105,9 @@ object BuilderBase {
             buildersTotal = total,
             builderRows = builderRows,
             labRow = labRow,
-            footerLeft = if (boostLeft > 0) "Clock Tower ${(boostLeft + 59) / 60}m" else "",
+            footerLeft = footer,
+            clockTowerReady = boostLeft <= 0 && readyIn <= 0,
+            nextChangeAt = nextChange,
             footerRight = "synced ${WidgetModelBuilder.formatAgo(now - t0)}",
             syncFailed = state.syncFailed,
         )

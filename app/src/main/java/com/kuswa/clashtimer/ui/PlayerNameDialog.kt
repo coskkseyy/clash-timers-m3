@@ -1,5 +1,6 @@
 package com.kuswa.clashtimer.ui
 
+import com.kuswa.clashtimer.core.Lang
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,10 +32,10 @@ fun PlayerNameDialog(current: String?, firstLaunch: Boolean, onDone: (String) ->
     val save = { onDone(AppSettings.cleanName(text)) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (firstLaunch) "Welcome, Chief!" else "Player name") },
+        title = { Text(if (firstLaunch) Lang.t("Welcome, Chief!", "Hoş geldin, Reis!") else Lang.t("Player name", "Oyuncu adı")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("What name should the widget show? Leave it empty to use \"${AppSettings.DEFAULT_PLAYER_NAME}\".")
+                Text(Lang.t("What name should the widget show? Leave it empty to use \"${AppSettings.DEFAULT_PLAYER_NAME}\".", "Widget'ta hangi isim yazsın? Boş bırakırsan \"${AppSettings.DEFAULT_PLAYER_NAME}\" yazar."))
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it.take(AppSettings.MAX_PLAYER_NAME) },
@@ -48,9 +49,9 @@ fun PlayerNameDialog(current: String?, firstLaunch: Boolean, onDone: (String) ->
                 )
             }
         },
-        confirmButton = { TextButton(onClick = save) { Text("Save") } },
+        confirmButton = { TextButton(onClick = save) { Text(Lang.t("Save", "Kaydet")) } },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(if (firstLaunch) "Skip" else "Cancel") }
+            TextButton(onClick = onDismiss) { Text(if (firstLaunch) Lang.t("Skip", "Geç") else Lang.t("Cancel", "İptal")) }
         },
     )
 }

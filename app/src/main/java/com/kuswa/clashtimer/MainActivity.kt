@@ -1,5 +1,6 @@
 package com.kuswa.clashtimer
 
+import com.kuswa.clashtimer.core.Lang
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -97,6 +98,7 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
 
     val state by repo.state.collectAsState(AppState())
     val settings by repo.settings.collectAsState(AppSettings())
+    Lang.apply(settings)
     // null until DataStore has loaded, so the first-launch prompt doesn't flash for returning players.
     val storedSettings by repo.settings.collectAsState<AppSettings, AppSettings?>(null)
     val log by repo.syncLog.collectAsState(SyncLog())
@@ -144,8 +146,8 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text("Clash Timers", style = MaterialTheme.typography.headlineSmall)
-        Text("1. In Clash: Settings > Data Export > Copy.\n2. Come back here and tap the button.")
+        Text("Clash Timer", style = MaterialTheme.typography.headlineSmall)
+        Text(Lang.t("1. In Clash: Settings > Data Export > Copy.\n2. Come back here and tap the button.", "1. Clash'te: Ayarlar > Veri Dışa Aktarma > Kopyala.\n2. Buraya dön ve butona bas."))
 
         Button(
             onClick = {
@@ -159,14 +161,14 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
             },
             enabled = !busy,
             modifier = Modifier.fillMaxWidth(),
-        ) { Text(if (busy) "Syncing…" else "Sync from clipboard") }
+        ) { Text(if (busy) Lang.t("Syncing…", "Sync yapılıyor…") else Lang.t("Sync from clipboard", "Panodan sync yap")) }
 
         // Last result, in plain text.
         val last = log.lastResult
-        Text("Last sync result", fontWeight = FontWeight.Bold)
+        Text(Lang.t("Last sync result", "Son sync sonucu"), fontWeight = FontWeight.Bold)
         SelectionContainer {
             Text(
-                if (last == null) "No sync yet."
+                if (last == null) Lang.t("No sync yet.", "Henüz sync yok.")
                 else "${if (last.ok == true) "OK" else "FAILED"} · ${fmt(last.at)} · from ${last.source}\n${SyncRunner.plainText(last.message)}",
                 color = if (last?.ok == false) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
             )
@@ -183,13 +185,13 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
 
         // ---- Diagnostics (no logcat on most phones): below the settings. ----
         HorizontalDivider()
-        Text("Diagnostics", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+        Text(Lang.t("Diagnostics", "Tanılama"), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
         CrashSection()
         Text("Widget", fontWeight = FontWeight.Bold)
         Text(
             when (widgetCount) {
                 -1 -> "Widgets placed: unknown"
-                0 -> "No Clash Timers widget is on the home screen yet."
+                0 -> Lang.t("No Clash Timer widget is on the home screen yet.", "Ana ekranda henüz Clash Timer widget'ı yok.")
                 else -> "Widgets placed: $widgetCount"
             },
         )
@@ -207,9 +209,9 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
                             .setData(android.net.Uri.parse("package:${context.packageName}")),
                     )
                 }
-            }) { Text("Allow exact alarms") }
+            }) { Text(Lang.t("Allow exact alarms", "Tam zamanlı alarmlara izin ver")) }
         }
-        SwitchRow("Live seconds countdown (turn off if the times don't show)", settings.liveCountdown) { on ->
+        SwitchRow(Lang.t("Live seconds countdown (turn off if the times don't show)", "Canlı saniye geri sayımı (süreler görünmüyorsa kapat)"), settings.liveCountdown) { on ->
             scope.launch {
                 repo.updateSettings { it.copy(liveCountdown = on) }
                 SyncRunner.refreshWidgets(context, "app")
@@ -218,9 +220,9 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
         OutlinedButton(
             onClick = { scope.launch { widgetCount = SyncRunner.refreshWidgets(context, "app") } },
             modifier = Modifier.fillMaxWidth(),
-        ) { Text("Refresh widget") }
+        ) { Text(Lang.t("Refresh widget", "Widget'ı yenile")) }
 
-        Text("The widget should show:", fontWeight = FontWeight.Bold)
+        Text(Lang.t("The widget should show:", "Widget'ta görünmesi gereken:"), fontWeight = FontWeight.Bold)
         SelectionContainer {
             Text(
                 widgetPreview(WidgetModelBuilder.build(state, settings, names, times, now)),
@@ -230,8 +232,8 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
         }
 
         HorizontalDivider()
-        Text("Recent activity", fontWeight = FontWeight.Bold)
-        if (log.entries.isEmpty()) Text("Nothing yet.")
+        Text(Lang.t("Recent activity", "Son olaylar"), fontWeight = FontWeight.Bold)
+        if (log.entries.isEmpty()) Text(Lang.t("Nothing yet.", "Henüz bir şey yok."))
         SelectionContainer {
             Text(SyncRunner.plainText(log.entries.joinToString("\n") { it.line() }), style = MaterialTheme.typography.bodySmall)
         }

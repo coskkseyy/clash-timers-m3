@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clash Timer</string>
+    <string name="widget_name">Clash Timer</string>
+    <string name="widget_mini_name">Clash Timer mini</string>
+    <string name="widget_description">İnşaatçı, laboratuvar ve evcil hayvan evi süreleri (köy verisi export\'undan)</string>
+    <string name="widget_mini_description">Bitecek en yakın yükseltmeler, 2x2</string>
+    <string name="widget_bb_name">Clash Timer İnşaatçı Üssü</string>
+    <string name="widget_bb_description">İnşaatçı Üssü inşaatçıları, Yıldız Laboratuvarı ve Saat Kulesi</string>
+</resources>

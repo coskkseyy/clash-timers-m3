@@ -126,6 +126,7 @@ object WidgetUpdater {
         val repo = StateRepository(app)
         return try {
             val settings = repo.currentSettings()
+            com.kuswa.clashtimer.core.Lang.apply(settings)
             val names = Names.get(app)
             val nowMs = System.currentTimeMillis()
             val now = nowMs / 1000
@@ -181,6 +182,7 @@ object WidgetUpdater {
                 listOfNotNull(
                     WidgetSchedule.nextUpdateMs(model, nowMs, settings.liveCountdown),
                     bbModel?.let { WidgetSchedule.nextRowsUpdateMs(it.allRows, nowMs, settings.liveCountdown) },
+                    bbModel?.nextChangeAt?.times(1000)?.takeIf { it > nowMs },
                 ).minOrNull(),
             )
             ids.size + miniIds.size + bbIds.size

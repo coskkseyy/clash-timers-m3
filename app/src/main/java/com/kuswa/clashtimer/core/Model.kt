@@ -66,6 +66,8 @@ data class VillageExport(
     val hasOttosOutpost: Boolean = false,
     /** `boosts.clocktower_boost`: seconds left on a running Clock Tower boost (10x) at T0, or null. */
     val clockTowerBoostRemaining: Long? = null,
+    /** `boosts.clocktower_cooldown`: seconds at T0 until the free Clock Tower boost is ready again, or null (ready). */
+    val clockTowerCooldown: Long? = null,
 ) {
     /** Builders derived from the export: huts + B.O.B. Null if no huts were found. */
     val derivedTotalBuilders: Int?

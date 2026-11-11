@@ -49,7 +49,7 @@ data class WidgetModel(
      */
     val nextChangeAt: Long?,
 ) {
-    val buildersLabel: String get() = "BUILDERS $buildersBusy/$buildersTotal"
+    val buildersLabel: String get() = Lang.t("BUILDERS", "İNŞAATÇILAR") + " $buildersBusy/$buildersTotal"
     val title: String get() = townHall?.let { "$playerName TH$it" } ?: playerName
     val labRows: List<WidgetRow> get() = listOf(labRow) + goblinLabRows
     val allRows: List<WidgetRow> get() = builderRows + labRows + petRow
@@ -65,7 +65,7 @@ data class BoostPill(
     val active: Boolean get() = secondsLeft != null
     val text: String
         get() = secondsLeft?.let(WidgetModelBuilder::formatPill)
-            ?: if (type == BoostType.BUILDER_BITE) "Bite" else "+1"
+            ?: if (type == BoostType.BUILDER_BITE) Lang.t("Bite", "Atıştırma") else "+1"
 }
 
 enum class FooterTone { NORMAL, IDLE, ERROR }
@@ -124,10 +124,10 @@ data class WidgetRow(
 }
 
 object WidgetModelBuilder {
-    const val COMPLETED = "Completed"
-    const val IDLE = "Idle"
-    const val SYNC_FAILED = "Sync failed — copy data and tap Sync"
-    const val NO_DATA = "Copy village data in Clash, then tap Sync"
+    val COMPLETED: String get() = Lang.t("Completed", "Bitti")
+    val IDLE: String get() = Lang.t("Idle", "Boşta")
+    val SYNC_FAILED: String get() = Lang.t("Sync failed — copy data and tap Sync", "Sync olmadı — veriyi kopyala, Sync'e bas")
+    val NO_DATA: String get() = Lang.t("Copy village data in Clash, then tap Sync", "Clash'te köy verisini kopyala, sonra Sync'e bas")
 
     fun build(
         state: AppState,
@@ -147,7 +147,7 @@ object WidgetModelBuilder {
                 bite = pills(BoostType.BUILDER_BITE), builderPotion = pills(BoostType.BUILDER_POTION),
                 researchPotion = pills(BoostType.RESEARCH_POTION), petPotion = pills(BoostType.PET_POTION),
                 builderRows = emptyList(),
-                labRow = idleRow("Laboratory", LABORATORY), petRow = idleRow("Pet House", PET_HOUSE),
+                labRow = idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY), petRow = idleRow(Lang.t("Pet House", "Evcil Hayvan Evi"), PET_HOUSE),
                 footerLeft = if (state.syncFailed) listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR)) else emptyList(),
                 footerRight = "", syncFailed = state.syncFailed, nextChangeAt = null,
             )
@@ -175,7 +175,7 @@ object WidgetModelBuilder {
             return WidgetRow(
                 kind = if (done) RowKind.COMPLETED else RowKind.RUNNING,
                 name = title,
-                levelText = if (job.isNewBuilding) "(new)" else job.targetLevel.toString(),
+                levelText = if (job.isNewBuilding) Lang.t("(new)", "(yeni)") else job.targetLevel.toString(),
                 showArrow = !job.isNewBuilding,
                 iconIds = listOfNotNull(job.dataId, job.typeDataId, job.parentDataId).distinct(),
                 initials = initials(title),
@@ -193,10 +193,10 @@ object WidgetModelBuilder {
         // Free builders get no rows; finished jobs stay as "Completed" until the next sync.
         // The Goblin's row disappears once it is done (it is not one of the player's builders).
         val builderRows = sorted(export.builderJobs).filter { !it.isGoblin || running(it) }.map(::row)
-        val labRow = sorted(export.labJobs.filter { !it.isGoblin }).firstOrNull()?.let(::row) ?: idleRow("Laboratory", LABORATORY)
+        val labRow = sorted(export.labJobs.filter { !it.isGoblin }).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY)
         // Like the Goblin Builder: the Goblin Researcher's row disappears once it is done.
         val goblinLabRows = sorted(export.labJobs.filter { it.isGoblin && running(it) }).map(::row)
-        val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow("Pet House", PET_HOUSE)
+        val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Pet House", "Evcil Hayvan Evi"), PET_HOUSE)
 
         val footerLeft = if (state.syncFailed) {
             listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR))
@@ -235,7 +235,7 @@ object WidgetModelBuilder {
             petRow = petRow,
             goblinLabRows = goblinLabRows,
             footerLeft = footerLeft,
-            footerRight = "synced ${formatAgo(now - export.timestamp)}",
+            footerRight = Lang.t("synced ", "sync: ") + formatAgo(now - export.timestamp),
             syncFailed = state.syncFailed,
             nextChangeAt = edges.filter { it > now }.minOrNull(),
         )
@@ -264,12 +264,12 @@ object WidgetModelBuilder {
      */
     fun helperStatus(apprentice: String?, assistant: String?): List<FooterPart> =
         if (apprentice != null && assistant != null) {
-            listOf(FooterPart("Helpers: $apprentice · $assistant"))
+            listOf(FooterPart(Lang.t("Helpers: ", "Yardımcılar: ") + "$apprentice · $assistant"))
         } else {
             listOf(
-                apprentice?.let { FooterPart("Apprentice: $it") } ?: FooterPart("Apprentice idle", FooterTone.IDLE),
+                apprentice?.let { FooterPart(Lang.t("Apprentice: ", "Çırak: ") + it) } ?: FooterPart(Lang.t("Apprentice idle", "Çırak boşta"), FooterTone.IDLE),
                 FooterPart(" · "),
-                assistant?.let { FooterPart("Assistant: $it") } ?: FooterPart("Assistant idle", FooterTone.IDLE),
+                assistant?.let { FooterPart(Lang.t("Assistant: ", "Asistan: ") + it) } ?: FooterPart(Lang.t("Assistant idle", "Asistan boşta"), FooterTone.IDLE),
             )
         }
 
@@ -323,9 +323,9 @@ object WidgetModelBuilder {
         val h = (minutes / 60) % 24
         val m = minutes % 60
         return when {
-            d > 0 -> "${d}d ${h}h"
-            h > 0 -> "${h}h ${m}m"
-            else -> "${m}m"
+            d > 0 -> "$d${Lang.d} $h${Lang.h}"
+            h > 0 -> "$h${Lang.h} $m${Lang.m}"
+            else -> "$m${Lang.m}"
         }
     }
 
@@ -333,10 +333,10 @@ object WidgetModelBuilder {
     fun formatAgo(seconds: Long): String {
         val s = seconds.coerceAtLeast(0)
         return when {
-            s < 60 -> "just now"
-            s < 3600 -> "${s / 60}m ago"
-            s < 2 * 86400 -> "${s / 3600}h ago"
-            else -> "${s / 86400}d ago"
+            s < 60 -> Lang.t("just now", "az önce")
+            s < 3600 -> Lang.t("${s / 60}m ago", "${s / 60}dk önce")
+            s < 2 * 86400 -> Lang.t("${s / 3600}h ago", "${s / 3600}s önce")
+            else -> Lang.t("${s / 86400}d ago", "${s / 86400}g önce")
         }
     }
 }

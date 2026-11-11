@@ -87,6 +87,8 @@ object ExportParser {
         val builderHall = buildings2.firstOrNull { it.int("data") == GameIds.BUILDER_HALL }?.int("lvl")
         val otto = buildings2.any { it.int("data") == GameIds.OTTOS_OUTPOST }
         val clockTower = (root["boosts"] as? JsonObject)?.long("clocktower_boost")?.takeIf { it > 0 }
+        // Seconds until the free daily Clock Tower boost can be used again (absent = ready).
+        val clockTowerCooldown = (root["boosts"] as? JsonObject)?.long("clocktower_cooldown")?.takeIf { it > 0 }
 
         val helpers = root.array("helpers").objects().mapNotNull { h ->
             val id = h.int("data") ?: return@mapNotNull null
@@ -108,6 +110,7 @@ object ExportParser {
                 builderHallLevel = builderHall,
                 hasOttosOutpost = otto,
                 clockTowerBoostRemaining = clockTower,
+                clockTowerCooldown = clockTowerCooldown,
             )
         )
     }

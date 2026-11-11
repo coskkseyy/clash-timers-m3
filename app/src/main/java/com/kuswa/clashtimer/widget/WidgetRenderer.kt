@@ -24,6 +24,7 @@ import com.kuswa.clashtimer.R
 import com.kuswa.clashtimer.core.BbModel
 import com.kuswa.clashtimer.core.BoostPill
 import com.kuswa.clashtimer.core.FinishClock
+import com.kuswa.clashtimer.core.Lang
 import com.kuswa.clashtimer.core.WidgetActions
 import com.kuswa.clashtimer.core.Countdown
 import com.kuswa.clashtimer.core.Finish
@@ -49,6 +50,10 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         rv.setOnClickPendingIntent(R.id.header, sync)
         rv.setOnClickPendingIntent(R.id.sync_button, sync)
         rv.setTextViewText(R.id.who, title(model))
+        rv.setTextViewText(R.id.sync_text, "Sync")
+        rv.setTextViewText(R.id.label_lab, Lang.t("LAB", "LABORATUVAR"))
+        rv.setTextViewText(R.id.label_pets, Lang.t("PETS", "EVCİL HAYVANLAR"))
+        rv.setTextViewText(R.id.empty_hint, Lang.t("Clash: Settings, Data Export, Copy", "Clash: Ayarlar, Veri Dışa Aktarma, Kopyala"))
 
         if (!model.hasData) {
             rv.setViewVisibility(R.id.content, View.GONE)
@@ -114,6 +119,8 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             title.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         rv.setTextViewText(R.id.who, title)
+        rv.setTextViewText(R.id.sync_text, "Sync")
+        rv.setTextViewText(R.id.section_lab, Lang.t("STAR LAB", "YILDIZ LAB"))
         if (!model.hasData) {
             rv.setViewVisibility(R.id.content, View.GONE)
             rv.setViewVisibility(R.id.empty, View.VISIBLE)
@@ -138,7 +145,11 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         rv.setViewVisibility(R.id.section_lab, labVis)
         rv.setViewVisibility(R.id.rows_lab, labVis)
         rv.setViewVisibility(R.id.footer, if (fit.footer) View.VISIBLE else View.GONE)
-        rv.setTextViewText(R.id.foot_left, model.footerLeft)
+        val clock = SpannableStringBuilder(model.footerLeft)
+        if (model.clockTowerReady) {
+            clock.setSpan(ForegroundColorSpan(color(R.color.m_primary)), 0, clock.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        rv.setTextViewText(R.id.foot_left, clock)
         rv.setTextViewText(R.id.foot_right, model.footerRight)
         return rv
     }
@@ -148,7 +159,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         val rv = RemoteViews(pkg, R.layout.widget_mini)
         rv.setOnClickPendingIntent(R.id.mini_sync, syncIntent())
         if (!model.hasData) {
-            rv.setTextViewText(R.id.mini_title, "Clash Timers")
+            rv.setTextViewText(R.id.mini_title, "Clash Timer")
             rv.setViewVisibility(R.id.mini_rows, View.GONE)
             rv.setViewVisibility(R.id.mini_empty, View.VISIBLE)
             rv.setTextViewText(R.id.mini_empty, if (model.syncFailed) WidgetModelBuilder.SYNC_FAILED else WidgetModelBuilder.NO_DATA)
@@ -202,7 +213,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
                 v.setInt(R.id.row, "setBackgroundResource", R.drawable.row_done)
                 v.setViewVisibility(R.id.row_chrono, View.GONE)
                 v.setViewVisibility(R.id.row_text, View.VISIBLE)
-                v.setTextViewText(R.id.row_text, if (row.kind == RowKind.COMPLETED) "Done" else row.staticStatus)
+                v.setTextViewText(R.id.row_text, if (row.kind == RowKind.COMPLETED) Lang.t("Done", "Bitti") else row.staticStatus)
             }
         }
         return v
@@ -369,7 +380,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         val sb = SpannableStringBuilder(label)
         if (free > 0) {
             val start = sb.length
-            sb.append(" · $free FREE")
+            sb.append(Lang.t(" · $free FREE", " · $free BOŞ"))
             sb.setSpan(ForegroundColorSpan(color(R.color.m_error)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         return sb

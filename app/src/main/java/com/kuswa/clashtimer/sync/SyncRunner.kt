@@ -34,6 +34,7 @@ object SyncRunner {
     suspend fun sync(context: Context, clipboard: String?, source: String): Result = withContext(NonCancellable) {
         val app = context.applicationContext
         val repo = StateRepository(app)
+        runCatching { com.kuswa.clashtimer.core.Lang.apply(repo.currentSettings()) }
         val result = try {
             val outcome = repo.updateState { old ->
                 val o = SyncLogic.apply(old, clipboard)

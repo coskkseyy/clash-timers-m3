@@ -64,6 +64,8 @@ data class AppSettings(
     val goldPassResearchPct: Int = 0,
     /** Rows show the clock time an upgrade finishes (`21:14`, `Thu 09:30`) instead of a countdown. */
     val showFinishTime: Boolean = false,
+    /** "auto" (phone language), "en" or "tr". */
+    val language: String = "auto",
 ) {
     /** Full upgrade time for [category] after the Gold Pass boost. */
     fun goldPassScaled(category: JobCategory, fullSec: Long): Long {

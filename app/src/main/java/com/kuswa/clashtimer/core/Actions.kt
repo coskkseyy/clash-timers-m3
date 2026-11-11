@@ -122,13 +122,13 @@ object FinishNotices {
 
     fun notice(job: Job, names: NameMap): FinishNotice {
         val title = names.title(job)
-        val text = if (job.isNewBuilding) "$title is built." else "$title reached level ${job.targetLevel}."
+        val text = if (job.isNewBuilding) Lang.t("$title is built.", "$title inşa edildi.") else Lang.t("$title reached level ${job.targetLevel}.", "$title seviye ${job.targetLevel} oldu.")
         val heading = when {
-            job.category == JobCategory.LAB && job.isGoblin -> "Goblin Researcher done: $title"
-            job.category == JobCategory.LAB -> "Lab free"
-            job.category == JobCategory.PET -> "Pet house free"
-            job.isGoblin -> "Goblin Builder done: $title"
-            else -> "Builder free: $title"
+            job.category == JobCategory.LAB && job.isGoblin -> Lang.t("Goblin Researcher done: $title", "Goblin Araştırmacı bitirdi: $title")
+            job.category == JobCategory.LAB -> Lang.t("Lab free", "Laboratuvar boşta")
+            job.category == JobCategory.PET -> Lang.t("Pet house free", "Evcil hayvan evi boşta")
+            job.isGoblin -> Lang.t("Goblin Builder done: $title", "Goblin İnşaatçı bitirdi: $title")
+            else -> Lang.t("Builder free: $title", "İnşaatçı boşta: $title")
         }
         return FinishNotice(job.key, heading, text)
     }
