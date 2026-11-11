@@ -230,6 +230,10 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
 
         if (row.goblin) {
             v.setViewVisibility(R.id.row_goblin, View.VISIBLE)
+            // Pull the badge right up to the building icon (layout margins are settable from Android 12).
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                v.setViewLayoutMargin(R.id.row_icon_slot, RemoteViews.MARGIN_END, 2f, android.util.TypedValue.COMPLEX_UNIT_DIP)
+            }
             // No Goblin Builder art exists in the data package; the Goblin troop portrait stands in.
             // Face first, then a small "Goblin" note.
             val goblinPx = ((if (compact) 16 else 19) * density).roundToInt()
@@ -425,7 +429,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             reportedHeightDp(options)?.let { it < normalHeightDp(rows) } ?: false
 
         // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
-        private const val FIT_BASE = 60      // panel padding + header
+        private const val FIT_BASE = 68      // panel padding (10 top, 18 bottom) + header
         const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
         private const val FIT_ROW = 33
         private const val FIT_ROW_COMPACT = 27

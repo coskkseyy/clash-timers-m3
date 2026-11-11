@@ -101,6 +101,20 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
     val storedSettings by repo.settings.collectAsState<AppSettings, AppSettings?>(null)
     val log by repo.syncLog.collectAsState(SyncLog())
 
+    // Android 13+: notifications need a runtime permission. Ask once per launch while they are
+    // switched on in Settings but not allowed yet (before, it was only asked when toggling the switch).
+    val notifPermission = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { }
+    LaunchedEffect(storedSettings?.notificationsEnabled) {
+        if (storedSettings?.notificationsEnabled == true &&
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+            !com.kuswa.clashtimer.notify.Notifier.allowed(context)
+        ) {
+            notifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     if (storedSettings?.needsPlayerName == true) {
         // First launch: ask for the widget's name. Skip / empty = "Chief"; stored as "" so it isn't asked again.
         val answer = { name: String ->

@@ -13,7 +13,10 @@
         android:layout_gravity="top"
         android:background="@drawable/widget_panel"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="18dp">
 
         <LinearLayout
             android:id="@+id/header"
