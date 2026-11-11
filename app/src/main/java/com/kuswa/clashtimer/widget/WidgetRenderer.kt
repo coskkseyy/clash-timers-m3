@@ -110,6 +110,9 @@ class WidgetRenderer(private val context: Context) {
             rv.setOnClickPendingIntent(R.id.mini_panel, syncIntent())
             return rv
         }
+        // Launchers reapply onto the existing views, so undo the no-data state explicitly.
+        rv.setViewVisibility(R.id.mini_empty, View.GONE)
+        rv.setViewVisibility(R.id.mini_rows, View.VISIBLE)
         clashIntent()?.let { rv.setOnClickPendingIntent(R.id.mini_panel, it) }
         rv.setTextViewText(R.id.mini_title, model.buildersLabel)
 
