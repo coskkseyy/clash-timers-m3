@@ -125,6 +125,14 @@ fun SettingsSection(
             b.boostsApplyToGoblin,
         ) { on -> boosts { it.copy(boostsApplyToGoblin = on) } }
 
+        Text("Gold Pass", style = MaterialTheme.typography.labelLarge)
+        GoldPassStepper("Builder boost", settings.goldPassBuilderPct) { v -> onChange { it.copy(goldPassBuilderPct = v) } }
+        GoldPassStepper("Research boost", settings.goldPassResearchPct) { v -> onChange { it.copy(goldPassResearchPct = v) } }
+        Text(
+            "Countdowns already include it (the game shortens the timer). This only keeps the progress bars right.",
+            style = MaterialTheme.typography.bodySmall,
+        )
+
         Text("Notifications", style = MaterialTheme.typography.labelLarge)
         SwitchRow("Notify when a builder, the lab or the pet house is free", settings.notificationsEnabled) { on ->
             onChange { it.copy(notificationsEnabled = on) }
@@ -182,6 +190,19 @@ private fun AutoHoursStepper(label: String, override: Long?, auto: Long?, range:
         onMinus = (current - 1).takeIf { it in range }?.let { v -> { onSet(v * H) } },
         onPlus = (current + 1).takeIf { it in range }?.let { v -> { onSet(v * H) } },
         onAuto = if (override != null) ({ onSet(null) }) else null,
+    )
+}
+
+private val GOLD_PASS_STEPS = listOf(0, 10, 15, 20)
+
+@Composable
+private fun GoldPassStepper(label: String, pct: Int, onSet: (Int) -> Unit) {
+    val i = GOLD_PASS_STEPS.indexOf(pct).coerceAtLeast(0)
+    Stepper(
+        label = label,
+        value = if (pct == 0) "Off" else "$pct %",
+        onMinus = GOLD_PASS_STEPS.getOrNull(i - 1)?.let { v -> { onSet(v) } },
+        onPlus = GOLD_PASS_STEPS.getOrNull(i + 1)?.let { v -> { onSet(v) } },
     )
 }
 
