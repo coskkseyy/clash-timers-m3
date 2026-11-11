@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Goblin badge: the panel's dark surface, so it stands out on the progress bar with any wallpaper -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/m_panel" />
+    <corners android:radius="7dp" />
+</shape>
