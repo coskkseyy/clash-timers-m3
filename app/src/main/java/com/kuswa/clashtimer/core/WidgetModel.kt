@@ -36,6 +36,8 @@ data class WidgetModel(
     val builderRows: List<WidgetRow>,
     val labRow: WidgetRow,
     val petRow: WidgetRow,
+    /** Running jobs of the event Goblin Researcher (`"extra": true` on a lab item), under the lab row. */
+    val goblinLabRows: List<WidgetRow> = emptyList(),
     /** Helper status (or the sync-failed message), left side of the footer. */
     val footerLeft: List<FooterPart>,
     /** `synced 14m ago`, right side of the footer. */
@@ -49,7 +51,8 @@ data class WidgetModel(
 ) {
     val buildersLabel: String get() = "BUILDERS $buildersBusy/$buildersTotal"
     val title: String get() = townHall?.let { "$playerName TH$it" } ?: playerName
-    val allRows: List<WidgetRow> get() = builderRows + labRow + petRow
+    val labRows: List<WidgetRow> get() = listOf(labRow) + goblinLabRows
+    val allRows: List<WidgetRow> get() = builderRows + labRows + petRow
 }
 
 /** A potion/snack button on a section line: `Bite` / `+1` when idle, minutes left when running. */
@@ -190,7 +193,9 @@ object WidgetModelBuilder {
         // Free builders get no rows; finished jobs stay as "Completed" until the next sync.
         // The Goblin's row disappears once it is done (it is not one of the player's builders).
         val builderRows = sorted(export.builderJobs).filter { !it.isGoblin || running(it) }.map(::row)
-        val labRow = sorted(export.labJobs).firstOrNull()?.let(::row) ?: idleRow("Laboratory", LABORATORY)
+        val labRow = sorted(export.labJobs.filter { !it.isGoblin }).firstOrNull()?.let(::row) ?: idleRow("Laboratory", LABORATORY)
+        // Like the Goblin Builder: the Goblin Researcher's row disappears once it is done.
+        val goblinLabRows = sorted(export.labJobs.filter { it.isGoblin && running(it) }).map(::row)
         val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow("Pet House", PET_HOUSE)
 
         val footerLeft = if (state.syncFailed) {
@@ -228,6 +233,7 @@ object WidgetModelBuilder {
             builderRows = builderRows,
             labRow = labRow,
             petRow = petRow,
+            goblinLabRows = goblinLabRows,
             footerLeft = footerLeft,
             footerRight = "synced ${formatAgo(now - export.timestamp)}",
             syncFailed = state.syncFailed,

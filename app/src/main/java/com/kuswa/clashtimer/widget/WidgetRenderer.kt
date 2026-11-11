@@ -57,6 +57,8 @@ class WidgetRenderer(private val context: Context) {
         }
         rv.setViewVisibility(R.id.empty, View.GONE)
         rv.setViewVisibility(R.id.content, View.VISIBLE)
+        // Tapping anywhere below the header (except the pills and row buttons) opens Clash of Clans.
+        clashIntent()?.let { rv.setOnClickPendingIntent(R.id.content, it) }
 
         rv.setTextViewText(R.id.builders_label, buildersLabel(model))
         pill(rv, PillIds(R.id.pill_bite, R.id.pill_bite_add, R.id.pill_bite_undo, R.id.pill_bite_icon, R.id.pill_bite_text),
@@ -76,7 +78,7 @@ class WidgetRenderer(private val context: Context) {
             rows.take(MAX_BUILDER_ROWS).forEach { rv.addView(container, row(it, compact, liveCountdown, nowMs, elapsed)) }
         }
         fill(R.id.rows_builders, model.builderRows)
-        fill(R.id.rows_lab, listOf(model.labRow))
+        fill(R.id.rows_lab, model.labRows)
         fill(R.id.rows_pet, listOf(model.petRow))
 
         rv.setTextViewText(R.id.foot_left, footer(model))
@@ -245,6 +247,13 @@ class WidgetRenderer(private val context: Context) {
         else rv.setTextColor(view, color(res))
     }
 
+    /** Opens Clash of Clans, or null if it isn't installed. */
+    private fun clashIntent(): PendingIntent? {
+        val launch = context.packageManager.getLaunchIntentForPackage(CLASH_PACKAGE) ?: return null
+        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return PendingIntent.getActivity(context, 1, launch, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
     private fun syncIntent(): PendingIntent {
         val intent = Intent(context, SyncActivity::class.java).addFlags(
             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TASK,
@@ -256,6 +265,7 @@ class WidgetRenderer(private val context: Context) {
 
     companion object {
         const val MAX_BUILDER_ROWS = 8
+        private const val CLASH_PACKAGE = "com.supercell.clashofclans"
 
 
         /** Estimated panel height in dp with 30 dp rows (see widget_root.xml / widget_row.xml). */
