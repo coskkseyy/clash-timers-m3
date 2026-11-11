@@ -124,6 +124,7 @@ object FinishNotices {
         val title = names.title(job)
         val text = if (job.isNewBuilding) "$title is built." else "$title reached level ${job.targetLevel}."
         val heading = when {
+            job.category == JobCategory.LAB && job.isGoblin -> "Goblin Researcher done: $title"
             job.category == JobCategory.LAB -> "Lab free"
             job.category == JobCategory.PET -> "Pet house free"
             job.isGoblin -> "Goblin Builder done: $title"

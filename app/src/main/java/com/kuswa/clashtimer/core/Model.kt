@@ -14,8 +14,8 @@ enum class JobSource { BUILDING, MODULE, TRAP, HERO, GUARDIAN, UNIT, SPELL, SIEG
  * @param helperLinked `helper_recurrent: true` on the item.
  * @param parentDataId for crafted-defense modules: the parent defense's `data` (e.g. 1000097).
  * @param typeDataId for crafted-defense modules: the `types[].data` the module belongs to.
- * @param isGoblin `"extra": true` — done by the event Goblin Builder (a temporary extra builder),
- *   not one of the regular builders.
+ * @param isGoblin `"extra": true` — done by an event goblin (Goblin Builder for builder jobs,
+ *   Goblin Researcher for lab jobs), not by the regular builders / laboratory.
  * @param helperTimer `helper_timer`: seconds left in the helper hour running on this item right now
  *   (0 = no session running).
  * @param occurrence 0-based index among jobs with the same category + data + target level,
@@ -71,7 +71,7 @@ data class VillageExport(
     val petJobs: List<Job> get() = jobs.filter { it.category == JobCategory.PET }
 
     /** The spec says at most one; extras (shouldn't happen) are still kept in [jobs]. */
-    val labJob: Job? get() = labJobs.firstOrNull()
+    val labJob: Job? get() = labJobs.firstOrNull { !it.isGoblin }
     val petJob: Job? get() = petJobs.firstOrNull()
 
     fun helper(dataId: Int): Helper? = helpers.firstOrNull { it.dataId == dataId }
