@@ -71,6 +71,7 @@
                     android:id="@+id/row_goblin"
                     android:layout_width="19dp"
                     android:layout_height="19dp"
+                    android:layout_marginStart="-4dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/badge_goblin"
                     android:visibility="gone">
