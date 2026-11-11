@@ -108,9 +108,13 @@ class WidgetRenderer(private val context: Context) {
 
         if (row.goblin) {
             v.setViewVisibility(R.id.row_goblin, View.VISIBLE)
-            icons.bitmap("goblin", (11 * density).roundToInt())?.let {
+            // No Goblin Builder art exists in the data package; the Goblin troop portrait stands in.
+            // With an icon the tag is just the face; the word only shows if no image is found.
+            val goblinPx = ((if (compact) 16 else 19) * density).roundToInt()
+            (icons.bitmap("goblin", goblinPx) ?: icons.bitmap(GOBLIN_TROOP_ID, goblinPx))?.let {
                 v.setImageViewBitmap(R.id.row_goblin_icon, it)
                 v.setViewVisibility(R.id.row_goblin_icon, View.VISIBLE)
+                v.setViewVisibility(R.id.row_goblin_text, View.GONE)
             }
         }
         v.setTextViewText(R.id.row_name, row.name)
@@ -266,6 +270,7 @@ class WidgetRenderer(private val context: Context) {
     companion object {
         const val MAX_BUILDER_ROWS = 8
         private const val CLASH_PACKAGE = "com.supercell.clashofclans"
+        private const val GOBLIN_TROOP_ID = "4000002"
 
 
         /** Estimated panel height in dp with 30 dp rows (see widget_root.xml / widget_row.xml). */

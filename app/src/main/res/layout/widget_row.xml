@@ -83,12 +83,12 @@
 
                     <ImageView
                         android:id="@+id/row_goblin_icon"
-                        android:layout_width="11dp"
-                        android:layout_height="11dp"
-                        android:layout_marginEnd="2dp"
+                        android:layout_width="19dp"
+                        android:layout_height="19dp"
                         android:visibility="gone" />
 
                     <TextView
+                        android:id="@+id/row_goblin_text"
                         style="@style/WidgetSmallSans"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

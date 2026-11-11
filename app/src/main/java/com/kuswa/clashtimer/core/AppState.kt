@@ -55,7 +55,24 @@ data class AppSettings(
      * null = never asked (the prompt shows); blank = asked and left empty ([DEFAULT_PLAYER_NAME]).
      */
     val playerName: String? = null,
+    /**
+     * Gold Pass Builder / Research boost in percent (0, 10, 15, 20). The game already shortens the
+     * timer when an upgrade starts, so countdowns are right without it; it only scales the full
+     * upgrade time so progress bars start at 0 instead of 20 %.
+     */
+    val goldPassBuilderPct: Int = 0,
+    val goldPassResearchPct: Int = 0,
 ) {
+    /** Full upgrade time for [category] after the Gold Pass boost. */
+    fun goldPassScaled(category: JobCategory, fullSec: Long): Long {
+        val pct = when (category) {
+            JobCategory.BUILDER -> goldPassBuilderPct
+            JobCategory.LAB -> goldPassResearchPct
+            JobCategory.PET -> 0
+        }
+        return fullSec * (100 - pct.coerceIn(0, 90)) / 100
+    }
+
     /** The name the widget shows: [playerName], or [DEFAULT_PLAYER_NAME] if it is missing or blank. */
     val displayName: String get() = playerName?.trim()?.takeIf { it.isNotEmpty() } ?: DEFAULT_PLAYER_NAME
 

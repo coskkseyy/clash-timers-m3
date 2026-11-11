@@ -162,7 +162,7 @@ object WidgetModelBuilder {
             val finishAt = finish.getValue(job.key)
             val done = Finish.isDone(finishAt, now)
             val workLeft = if (done) 0L else engine.remainingAt(job, export, state.links, state.boosts, at)
-            val full = times.fullTime(job)?.takeIf { it >= job.remainingAtT0 }
+            val full = times.fullTime(job)?.let { settings.goldPassScaled(job.category, it) }?.takeIf { it >= job.remainingAtT0 }
                 ?: maxOf(state.firstRemaining[job.key] ?: 0L, job.remainingAtT0)
             val title = names.title(job)
             val button = when {
