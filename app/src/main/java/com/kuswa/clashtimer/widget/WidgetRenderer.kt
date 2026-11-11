@@ -21,7 +21,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import com.kuswa.clashtimer.R
+import com.kuswa.clashtimer.core.BbModel
 import com.kuswa.clashtimer.core.BoostPill
+import com.kuswa.clashtimer.core.FinishClock
 import com.kuswa.clashtimer.core.WidgetActions
 import com.kuswa.clashtimer.core.Countdown
 import com.kuswa.clashtimer.core.Finish
@@ -35,7 +37,7 @@ import com.kuswa.clashtimer.sync.SyncActivity
 import kotlin.math.roundToInt
 
 /** Maps a [WidgetModel] onto `widget_root.xml` + one `widget_row*.xml` per row. */
-class WidgetRenderer(private val context: Context) {
+class WidgetRenderer(private val context: Context, private val finishTime: Boolean = false) {
 
     private val pkg = context.packageName
     private val icons = WidgetIcons.get(context)
@@ -98,6 +100,49 @@ class WidgetRenderer(private val context: Context) {
         return rv
     }
 
+    /** The Builder Base widget: builders, Star Laboratory, Clock Tower boost and sync age. */
+    fun renderBb(model: BbModel, liveCountdown: Boolean, options: Bundle?): RemoteViews {
+        val rv = RemoteViews(pkg, R.layout.widget_bb)
+        val sync = syncIntent()
+        rv.setOnClickPendingIntent(R.id.header, sync)
+        rv.setOnClickPendingIntent(R.id.sync_button, sync)
+        val title = SpannableStringBuilder(model.playerName)
+        model.builderHall?.let { bh ->
+            val start = title.length
+            title.append(" BH$bh")
+            title.setSpan(AbsoluteSizeSpan(12, true), start, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            title.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        rv.setTextViewText(R.id.who, title)
+        if (!model.hasData) {
+            rv.setViewVisibility(R.id.content, View.GONE)
+            rv.setViewVisibility(R.id.empty, View.VISIBLE)
+            rv.setOnClickPendingIntent(R.id.empty, sync)
+            rv.setTextViewText(R.id.empty, if (model.syncFailed) WidgetModelBuilder.SYNC_FAILED else WidgetModelBuilder.NO_DATA)
+            return rv
+        }
+        rv.setViewVisibility(R.id.empty, View.GONE)
+        rv.setViewVisibility(R.id.content, View.VISIBLE)
+        clashIntent()?.let { rv.setOnClickPendingIntent(R.id.content, it) }
+        rv.setTextViewText(R.id.builders_label, withFree(model.buildersLabel, model.buildersTotal - model.buildersBusy))
+
+        // Same height logic as the big widget, with one row section fewer.
+        val fit = fit(reportedHeightDp(options)?.plus(FIT_SECTION), model.builderRows.size, 1, 0)
+        val nowMs = System.currentTimeMillis()
+        val elapsed = SystemClock.elapsedRealtime()
+        rv.removeAllViews(R.id.rows_builders)
+        model.builderRows.take(fit.builders).forEach { rv.addView(R.id.rows_builders, row(it, fit.compact, liveCountdown, nowMs, elapsed)) }
+        rv.removeAllViews(R.id.rows_lab)
+        val labVis = if (fit.lab > 0) View.VISIBLE else View.GONE
+        if (fit.lab > 0) rv.addView(R.id.rows_lab, row(model.labRow, fit.compact, liveCountdown, nowMs, elapsed))
+        rv.setViewVisibility(R.id.section_lab, labVis)
+        rv.setViewVisibility(R.id.rows_lab, labVis)
+        rv.setViewVisibility(R.id.footer, if (fit.footer) View.VISIBLE else View.GONE)
+        rv.setTextViewText(R.id.foot_left, model.footerLeft)
+        rv.setTextViewText(R.id.foot_right, model.footerRight)
+        return rv
+    }
+
     /** The 2x2 widget: free-builder count, Sync, and the next jobs to finish as icon + countdown. */
     fun renderMini(model: WidgetModel, liveCountdown: Boolean, options: Bundle?): RemoteViews {
         val rv = RemoteViews(pkg, R.layout.widget_mini)
@@ -114,7 +159,7 @@ class WidgetRenderer(private val context: Context) {
         rv.setViewVisibility(R.id.mini_empty, View.GONE)
         rv.setViewVisibility(R.id.mini_rows, View.VISIBLE)
         clashIntent()?.let { rv.setOnClickPendingIntent(R.id.mini_panel, it) }
-        rv.setTextViewText(R.id.mini_title, model.buildersLabel)
+        rv.setTextViewText(R.id.mini_title, withFree(model.buildersLabel, model.buildersTotal - model.buildersBusy))
 
         val nowMs = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtime()
@@ -142,14 +187,14 @@ class WidgetRenderer(private val context: Context) {
         when (row.kind) {
             RowKind.RUNNING -> {
                 v.setProgressBar(R.id.row_fill, 1000, (row.progress * 1000).roundToInt(), false)
-                val segment = if (live) row.finishAt?.let { Countdown.segment(it, nowMs) } else null
+                val segment = if (live && !finishTime) row.finishAt?.let { Countdown.segment(it, nowMs) } else null
                 if (segment != null) {
                     v.setChronometer(R.id.row_chrono, elapsed + segment.chronometerMs, segment.format, true)
                     v.setChronometerCountDown(R.id.row_chrono, true)
                 } else {
                     v.setViewVisibility(R.id.row_chrono, View.GONE)
                     v.setViewVisibility(R.id.row_text, View.VISIBLE)
-                    v.setTextViewText(R.id.row_text, row.staticStatus)
+                    v.setTextViewText(R.id.row_text, runningText(row))
                 }
             }
             RowKind.COMPLETED, RowKind.IDLE -> {
@@ -204,14 +249,14 @@ class WidgetRenderer(private val context: Context) {
             RowKind.RUNNING -> {
                 v.setProgressBar(R.id.row_fill, 1000, (row.progress * 1000).roundToInt(), false)
                 icons.bitmap("clock", (12 * density).roundToInt())?.let { v.setImageViewBitmap(R.id.row_clock, it) }
-                val segment = if (live) row.finishAt?.let { Countdown.segment(it, nowMs) } else null
+                val segment = if (live && !finishTime) row.finishAt?.let { Countdown.segment(it, nowMs) } else null
                 if (segment != null) {
                     v.setChronometer(R.id.row_chrono, elapsed + segment.chronometerMs, segment.format, true)
                     v.setChronometerCountDown(R.id.row_chrono, true)
                 } else {
                     v.setViewVisibility(R.id.row_chrono, View.GONE)
                     v.setViewVisibility(R.id.row_text, View.VISIBLE)
-                    v.setTextViewText(R.id.row_text, row.staticStatus)
+                    v.setTextViewText(R.id.row_text, runningText(row))
                 }
             }
             RowKind.COMPLETED, RowKind.IDLE -> {
@@ -291,7 +336,7 @@ class WidgetRenderer(private val context: Context) {
 
     /** `BUILDERS 6/6` + tertiary ` + Goblin`. */
     private fun buildersLabel(model: WidgetModel): CharSequence {
-        val sb = SpannableStringBuilder(model.buildersLabel)
+        val sb = SpannableStringBuilder(withFree(model.buildersLabel, model.buildersTotal - model.buildersBusy))
         if (model.goblinWorking) {
             val start = sb.length
             sb.append(" + Goblin")
@@ -314,6 +359,22 @@ class WidgetRenderer(private val context: Context) {
         }
         return sb
     }
+
+    /** `BUILDERS 5/6` + an error-colored ` · 1 FREE` when builders are idle. */
+    private fun withFree(label: String, free: Int): CharSequence {
+        val sb = SpannableStringBuilder(label)
+        if (free > 0) {
+            val start = sb.length
+            sb.append(" · $free FREE")
+            sb.setSpan(ForegroundColorSpan(color(R.color.m_error)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        return sb
+    }
+
+    /** A running row's text without a live chronometer: finish clock time, or the static `1d 20h`. */
+    private fun runningText(row: WidgetRow): String =
+        if (finishTime && row.finishAt != null) FinishClock.format(row.finishAt, System.currentTimeMillis() / 1000)
+        else row.staticStatus
 
     /** Resolved now; used for text spans, which can't hold a resource reference. */
     private fun color(@ColorRes res: Int): Int = context.getColor(res)
@@ -365,7 +426,7 @@ class WidgetRenderer(private val context: Context) {
 
         // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
         private const val FIT_BASE = 60      // panel padding + header
-        private const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
+        const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
         private const val FIT_ROW = 33
         private const val FIT_ROW_COMPACT = 27
         private const val FIT_FOOTER = 20

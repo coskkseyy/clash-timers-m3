@@ -59,6 +59,13 @@ data class VillageExport(
     val helperOnFinishedItem: Set<JobCategory> = emptySet(),
     /** `boosts.builder_boost`: seconds left on an active home-village builder potion at T0, or null. */
     val builderBoostRemaining: Long? = null,
+    /** Builder Base upgrades (`buildings2`, `traps2`, `heroes2` → BUILDER; `units2` → LAB). */
+    val bbJobs: List<Job> = emptyList(),
+    val builderHallLevel: Int? = null,
+    /** O.T.T.O's Outpost built → O.T.T.O is the second Builder Base builder. */
+    val hasOttosOutpost: Boolean = false,
+    /** `boosts.clocktower_boost`: seconds left on a running Clock Tower boost (10x) at T0, or null. */
+    val clockTowerBoostRemaining: Long? = null,
 ) {
     /** Builders derived from the export: huts + B.O.B. Null if no huts were found. */
     val derivedTotalBuilders: Int?

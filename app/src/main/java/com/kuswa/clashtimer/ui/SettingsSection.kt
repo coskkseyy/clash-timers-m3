@@ -125,6 +125,11 @@ fun SettingsSection(
             b.boostsApplyToGoblin,
         ) { on -> boosts { it.copy(boostsApplyToGoblin = on) } }
 
+        Text("Widget", style = MaterialTheme.typography.labelLarge)
+        SwitchRow("Show finish time (21:14) instead of a countdown", settings.showFinishTime) { on ->
+            onChange { it.copy(showFinishTime = on) }
+        }
+
         Text("Gold Pass", style = MaterialTheme.typography.labelLarge)
         GoldPassStepper("Builder boost", settings.goldPassBuilderPct) { v -> onChange { it.copy(goldPassBuilderPct = v) } }
         GoldPassStepper("Research boost", settings.goldPassResearchPct) { v -> onChange { it.copy(goldPassResearchPct = v) } }

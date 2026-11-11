@@ -10,7 +10,7 @@ import kotlinx.serialization.json.longOrNull
 
 /**
  * Parses the Clash of Clans village data export (Settings → Data Export → Copy).
- * Pure Kotlin, no Android dependencies. Builder Base sections (`*2`, `boosts`) are ignored.
+ * Pure Kotlin, no Android dependencies. Builder Base sections (`*2`) go to [VillageExport.bbJobs].
  */
 object ExportParser {
 
@@ -75,6 +75,19 @@ object ExportParser {
             .sumOf { it.int("cnt") ?: 1 }
         val bobsHut = buildings.objects().any { it.int("data") == GameIds.BOBS_HUT }
 
+        // Builder Base: its own two builders (Master Builder + O.T.T.O) and the Star Laboratory.
+        val bbJobs = mutableListOf<Job>()
+        fun bbVisit(section: String, category: JobCategory, source: JobSource) =
+            root.array(section).objects().forEach { o -> o.toJob(category, source)?.let { bbJobs += it } }
+        bbVisit("buildings2", JobCategory.BUILDER, JobSource.BUILDING)
+        bbVisit("traps2", JobCategory.BUILDER, JobSource.TRAP)
+        bbVisit("heroes2", JobCategory.BUILDER, JobSource.HERO)
+        bbVisit("units2", JobCategory.LAB, JobSource.UNIT)
+        val buildings2 = root.array("buildings2").objects()
+        val builderHall = buildings2.firstOrNull { it.int("data") == GameIds.BUILDER_HALL }?.int("lvl")
+        val otto = buildings2.any { it.int("data") == GameIds.OTTOS_OUTPOST }
+        val clockTower = (root["boosts"] as? JsonObject)?.long("clocktower_boost")?.takeIf { it > 0 }
+
         val helpers = root.array("helpers").objects().mapNotNull { h ->
             val id = h.int("data") ?: return@mapNotNull null
             Helper(dataId = id, level = h.int("lvl") ?: 0, cooldown = h.long("helper_cooldown") ?: 0L)
@@ -91,6 +104,10 @@ object ExportParser {
                 jobs = assignOccurrences(jobs),
                 helperOnFinishedItem = helperOnFinished,
                 builderBoostRemaining = builderBoost,
+                bbJobs = assignOccurrences(bbJobs),
+                builderHallLevel = builderHall,
+                hasOttosOutpost = otto,
+                clockTowerBoostRemaining = clockTower,
             )
         )
     }

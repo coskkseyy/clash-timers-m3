@@ -35,6 +35,8 @@
 
         <ImageView
             android:id="@+id/row_goblin_icon"
+            android:background="@drawable/badge_circle"
+            android:padding="1dp"
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:layout_marginStart="2dp"
