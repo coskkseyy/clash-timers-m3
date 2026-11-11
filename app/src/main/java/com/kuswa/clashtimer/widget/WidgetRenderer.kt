@@ -425,8 +425,8 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         private const val GOBLIN_TROOP_ID = "4000002"
 
 
-        /** Estimated panel height in dp with 30 dp rows (see widget_root.xml / widget_row.xml). */
-        fun normalHeightDp(rows: Int): Int = 165 + 33 * rows
+        /** Estimated panel height in dp with 28 dp rows (see widget_root.xml / widget_row.xml). */
+        fun normalHeightDp(rows: Int): Int = 173 + 31 * rows
 
         /** Widget height in dp as reported by the launcher (portrait), or null if unknown. */
         fun reportedHeightDp(options: Bundle?): Int? =
@@ -440,9 +440,9 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             reportedHeightDp(options)?.let { it < normalHeightDp(rows) } ?: false
 
         // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
-        private const val FIT_BASE = 60      // panel padding + header
+        private const val FIT_BASE = 68      // panel padding (10 top, 18 bottom) + header
         const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
-        private const val FIT_ROW = 33
+        private const val FIT_ROW = 31
         private const val FIT_ROW_COMPACT = 27
         private const val FIT_FOOTER = 20
 

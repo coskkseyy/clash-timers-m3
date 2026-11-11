@@ -296,9 +296,9 @@ object WidgetModelBuilder {
         val h = minutes / 60
         val m = minutes % 60
         return when {
-            h == 0L -> "${m}m"
-            m == 0L -> "${h}h"
-            else -> "${h}h ${m}m"
+            h == 0L -> "$m${Lang.m}"
+            m == 0L -> "$h${Lang.h}"
+            else -> "$h${Lang.h} $m${Lang.m}"
         }
     }
 

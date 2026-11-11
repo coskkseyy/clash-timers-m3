@@ -35,9 +35,9 @@ object Countdown {
         val inDay = left - days * DAY_MS
         val dayBase = days * DAY_MS
         val (format, edgeLeft) = when {
-            days > 0 && inDay >= 10 * HOUR_MS -> "${days}d %s" to dayBase + 10 * HOUR_MS
-            days > 0 && inDay >= HOUR_MS -> "${days}d 0%s" to dayBase + HOUR_MS
-            days > 0 -> "${days}d 00:%s" to dayBase
+            days > 0 && inDay >= 10 * HOUR_MS -> "$days${Lang.d} %s" to dayBase + 10 * HOUR_MS
+            days > 0 && inDay >= HOUR_MS -> "$days${Lang.d} 0%s" to dayBase + HOUR_MS
+            days > 0 -> "$days${Lang.d} 00:%s" to dayBase
             inDay >= HOUR_MS -> "%s" to HOUR_MS
             else -> "0:%s" to 0L
         }
@@ -51,7 +51,7 @@ object Countdown {
         val h = (s % 86400) / 3600
         val m = (s % 3600) / 60
         val sec = s % 60
-        return if (d > 0) String.format(Locale.ROOT, "%dd %02d:%02d:%02d", d, h, m, sec)
+        return if (d > 0) String.format(Locale.ROOT, "%d%s %02d:%02d:%02d", d, Lang.d, h, m, sec)
         else String.format(Locale.ROOT, "%d:%02d:%02d", h, m, sec)
     }
 }
