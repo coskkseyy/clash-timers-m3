@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.SpannableStringBuilder
@@ -16,6 +17,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.LruCache
 import android.view.View
 import android.widget.RemoteViews
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import com.kuswa.clashtimer.R
@@ -157,7 +159,7 @@ class WidgetRenderer(private val context: Context) {
                     v.setViewVisibility(R.id.row_btn_text, View.GONE)
                 } else {
                     v.setTextViewText(R.id.row_btn_text, "H")
-                    v.setTextColor(R.id.row_btn_text, COLOR_SYNC_TEXT)
+                    textColor(v, R.id.row_btn_text, R.color.m_on_tert_cont)
                     v.setTextViewTextSize(R.id.row_btn_text, android.util.TypedValue.COMPLEX_UNIT_DIP, 10f)
                 }
             }
@@ -174,7 +176,7 @@ class WidgetRenderer(private val context: Context) {
         val bmp = icons.bitmap(asset, (14 * density).roundToInt())
         if (bmp != null) rv.setImageViewBitmap(ids.icon, bmp) else rv.setImageViewResource(ids.icon, fallback)
         rv.setTextViewText(ids.text, pill.text)
-        rv.setTextColor(ids.text, if (pill.active) COLOR_GOLD else COLOR_WHITE)
+        textColor(rv, ids.text, if (pill.active) R.color.m_primary else R.color.m_on_pill)
         rv.setInt(ids.box, "setBackgroundResource", if (pill.active || pill.canUndo) R.drawable.pill_on else R.drawable.pill_off)
         rv.setOnClickPendingIntent(ids.add, tapIntent(WidgetActions.ADD_BOOST, pill.type.name))
         rv.setViewVisibility(ids.undo, if (pill.canUndo) View.VISIBLE else View.GONE)
@@ -193,25 +195,25 @@ class WidgetRenderer(private val context: Context) {
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    /** Player name + small gold `TH18`. */
+    /** Player name + small primary-colored `TH18`. */
     private fun title(model: WidgetModel): CharSequence {
         val sb = SpannableStringBuilder(model.playerName)
         model.townHall?.let { th ->
             val start = sb.length
             sb.append(" TH$th")
             sb.setSpan(AbsoluteSizeSpan(12, true), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sb.setSpan(ForegroundColorSpan(COLOR_GOLD), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         return sb
     }
 
-    /** `BUILDERS 6/6` + green ` + Goblin`. */
+    /** `BUILDERS 6/6` + tertiary ` + Goblin`. */
     private fun buildersLabel(model: WidgetModel): CharSequence {
         val sb = SpannableStringBuilder(model.buildersLabel)
         if (model.goblinWorking) {
             val start = sb.length
             sb.append(" + Goblin")
-            sb.setSpan(ForegroundColorSpan(COLOR_GOBLIN), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(ForegroundColorSpan(color(R.color.m_tertiary)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         return sb
     }
@@ -223,12 +225,24 @@ class WidgetRenderer(private val context: Context) {
             sb.append(part.text)
             val color = when (part.tone) {
                 FooterTone.NORMAL -> null
-                FooterTone.IDLE -> COLOR_IDLE
-                FooterTone.ERROR -> COLOR_ERROR
+                FooterTone.IDLE -> color(R.color.m_tertiary)
+                FooterTone.ERROR -> color(R.color.m_error)
             }
             color?.let { sb.setSpan(ForegroundColorSpan(it), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) }
         }
         return sb
+    }
+
+    /** Resolved now; used for text spans, which can't hold a resource reference. */
+    private fun color(@ColorRes res: Int): Int = context.getColor(res)
+
+    /**
+     * On Android 12+ the launcher resolves the color resource itself, so the text follows
+     * wallpaper (Material You) changes without waiting for the next render.
+     */
+    private fun textColor(rv: RemoteViews, @IdRes view: Int, @ColorRes res: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) rv.setColorStateList(view, "setTextColor", res)
+        else rv.setTextColor(view, color(res))
     }
 
     private fun syncIntent(): PendingIntent {
@@ -243,12 +257,6 @@ class WidgetRenderer(private val context: Context) {
     companion object {
         const val MAX_BUILDER_ROWS = 8
 
-        private const val COLOR_WHITE = 0xFFFFFFFF.toInt()
-        private const val COLOR_GOLD = 0xFFFFD24A.toInt()
-        private const val COLOR_GOBLIN = 0xFF6FD36A.toInt()
-        private const val COLOR_IDLE = 0xFFFFB35C.toInt()
-        private const val COLOR_ERROR = 0xFFFF7A7A.toInt()
-        private const val COLOR_SYNC_TEXT = 0xFF5A3500.toInt()
 
         /** Estimated panel height in dp with 30 dp rows (see widget_root.xml / widget_row.xml). */
         fun normalHeightDp(rows: Int): Int = 165 + 33 * rows

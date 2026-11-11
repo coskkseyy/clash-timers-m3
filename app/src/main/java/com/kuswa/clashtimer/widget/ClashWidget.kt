@@ -23,7 +23,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
- * The home-screen widget, drawn with plain RemoteViews (not Glance) so it can use the Lilita One
+ * The home-screen widget, drawn with plain RemoteViews (not Glance) so it can use custom
  * font, Chronometer countdowns, progress bars and the design's drawables.
  * The class name is unchanged from the Glance version so a placed widget keeps working.
  *

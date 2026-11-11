@@ -25,12 +25,13 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.kuswa.clashtimer"
+        // Own id so it installs next to the original Clash Timers.
+        applicationId = "com.cosk.clashtimer.material"
         minSdk = 26
         targetSdk = 37
         // Bump both for every release; a lower versionCode can't install over a higher one.
         versionCode = 3
-        versionName = "1.0.2"
+        versionName = "1.0.2-material"
         // Shown in crash reports (crash/CrashReporter.kt). R8 is off in every build (see release below).
         manifestPlaceholders["r8"] = "off"
 
@@ -40,7 +41,7 @@ android {
     signingConfigs {
         if (signingProps != null) {
             create("release") {
-                storeFile = File(signingProps.getProperty("storeFile"))
+                storeFile = rootProject.file(signingProps.getProperty("storeFile"))
                 storePassword = signingProps.getProperty("storePassword")
                 keyAlias = signingProps.getProperty("keyAlias")
                 keyPassword = signingProps.getProperty("keyPassword")

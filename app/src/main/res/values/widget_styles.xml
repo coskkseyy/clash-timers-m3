@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget text styles. Sizes are in dp, not sp, so the fixed 4×5 layout
-     looks the same regardless of the phone's font size setting. -->
+<!-- Widget text styles (Material You). Sizes are in dp, not sp, so the fixed layout
+     looks the same regardless of the phone's font size setting. Colors live in m_colors.xml. -->
 <resources>
-    <color name="w_white">#FFFFFF</color>
-    <color name="w_gold">#FFD24A</color>
-    <color name="w_sub">#E9DCC8</color>
-    <color name="w_goblin">#6FD36A</color>
-    <color name="w_idle">#FFB35C</color>
-    <color name="w_error">#FF7A7A</color>
-    <color name="w_sync_text">#5A3500</color>
+    <!-- Kept so older references still resolve; the widget itself uses m_* colors. -->
+    <color name="w_white">@color/m_on</color>
+    <color name="w_gold">@color/m_primary</color>
+    <color name="w_sub">@color/m_sub</color>
+    <color name="w_goblin">@color/m_tertiary</color>
+    <color name="w_idle">@color/m_tertiary</color>
+    <color name="w_error">@color/m_error</color>
+    <color name="w_sync_text">@color/m_on_primary</color>
 
-    <!-- Lilita One with the dark outline-like shadow used on the row text. -->
+    <!-- System font, no shadows. -->
     <style name="WidgetText">
-        <item name="android:fontFamily">@font/lilita_one</item>
-        <item name="android:textColor">@color/w_white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/m_on</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:singleLine">true</item>
-        <item name="android:shadowColor">#F0000000</item>
-        <item name="android:shadowDx">0</item>
-        <item name="android:shadowDy">1</item>
-        <item name="android:shadowRadius">1.6</item>
     </style>
 
     <style name="WidgetText.Name">
@@ -28,8 +25,9 @@
     </style>
 
     <style name="WidgetText.Level">
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:textSize">11dp</item>
-        <item name="android:textColor">@color/w_sub</item>
+        <item name="android:textColor">@color/m_sub</item>
     </style>
 
     <style name="WidgetText.Time">
@@ -38,28 +36,22 @@
     </style>
 
     <style name="WidgetText.Section">
-        <item name="android:textSize">12.5dp</item>
-        <item name="android:textColor">@color/w_gold</item>
-        <item name="android:letterSpacing">0.025</item>
-        <item name="android:shadowDy">1</item>
-        <item name="android:shadowRadius">1</item>
-        <item name="android:shadowColor">#80000000</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/m_primary</item>
+        <item name="android:letterSpacing">0.08</item>
     </style>
 
     <style name="WidgetText.Pill">
         <item name="android:textSize">11dp</item>
-        <item name="android:shadowRadius">0</item>
-        <item name="android:shadowDy">0</item>
+        <item name="android:textColor">@color/m_on_pill</item>
     </style>
 
     <style name="WidgetText.Footer">
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:textSize">11dp</item>
-        <item name="android:textColor">@color/w_sub</item>
-        <item name="android:shadowRadius">0</item>
-        <item name="android:shadowDy">0</item>
+        <item name="android:textColor">@color/m_sub</item>
     </style>
 
-    <!-- Small system-font labels: the design uses a plain sans for these. -->
     <style name="WidgetSmallSans">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:includeFontPadding">false</item>
