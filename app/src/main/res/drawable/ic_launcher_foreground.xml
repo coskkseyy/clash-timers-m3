@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shield with a clock badge, flat two-tone in the phone's icon style -->
+<!-- Shield (light left half, dimmer right half, outline) with a clock badge -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- two-tone shield -->
-    <path android:fillColor="@color/icon_fg" android:fillAlpha="0.62" android:pathData="M51,28L71,34V50C71,62 63,71 51,76Z" />
-    <path android:fillColor="@color/icon_fg" android:pathData="M51,28L31,34V50C31,62 39,71 51,76Z" />
-    <!-- clock badge, cut out of the shield -->
-    <path android:fillColor="@color/icon_bg" android:pathData="M66,52a14,14 0,1 1,0 28a14,14 0,1 1,0 -28z" />
-    <path android:fillColor="@color/icon_fg" android:pathData="M66,55.5a10.5,10.5 0,1 1,0 21a10.5,10.5 0,1 1,0 -21z" />
-    <path android:strokeColor="@color/icon_bg" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"
-        android:fillColor="#00000000" android:pathData="M66,59.5V66L70.5,68.8" />
+    <group>
+        <!-- everything except a gap around the clock badge -->
+        <clip-path android:pathData="M0,0h108v108h-108zM67,52.5a14.5,14.5 0,1 0,0 29.0a14.5,14.5 0,1 0,0 -29.0z" />
+        <path android:fillColor="@color/icon_fg" android:fillAlpha="0.62" android:pathData="M54,27L59,27Q62.5,27 63.5,30Q64.5,33 67,33L74,33Q79,33 79,38L79,53C79,67 68,77 54,82Z" />
+        <path android:fillColor="@color/icon_fg" android:pathData="M54,27L49,27Q45.5,27 44.5,30Q43.5,33 41,33L34,33Q29,33 29,38L29,53C29,67 40,77 54,82Z" />
+        <path android:strokeColor="@color/icon_fg" android:strokeWidth="3.5" android:strokeLineJoin="round"
+            android:fillColor="#00000000" android:pathData="M29,38Q29,33 34,33L41,33Q43.5,33 44.5,30Q45.5,27 49,27L59,27Q62.5,27 63.5,30Q64.5,33 67,33L74,33Q79,33 79,38L79,53C79,67 68,77 54,82C40,77 29,67 29,53Z" />
+    </group>
+    <path android:fillColor="@color/icon_fg" android:pathData="M67,56a11,11 0,1 1,0 22a11,11 0,1 1,0 -22z" />
+    <path android:strokeColor="@color/icon_bg" android:strokeWidth="2.8" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:fillColor="#00000000" android:pathData="M67,60.5V67L71.6,69.8" />
 </vector>
