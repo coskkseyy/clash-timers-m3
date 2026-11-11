@@ -429,7 +429,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             reportedHeightDp(options)?.let { it < normalHeightDp(rows) } ?: false
 
         // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
-        private const val FIT_BASE = 68      // panel padding (10 top, 18 bottom) + header
+        private const val FIT_BASE = 60      // panel padding + header
         const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
         private const val FIT_ROW = 33
         private const val FIT_ROW_COMPACT = 27
