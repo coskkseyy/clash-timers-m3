@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Clash Timers M3</string>
-    <string name="widget_name">Clash Timers</string>
+    <string name="app_name">Clash Timer</string>
+    <string name="widget_name">Clash Timer</string>
     <string name="widget_description">Builder, lab and pet house timers from your village data export</string>
-    <string name="widget_mini_name">Clash Timers mini</string>
+    <string name="widget_mini_name">Clash Timer mini</string>
     <string name="widget_mini_description">The next upgrades to finish, in 2x2</string>
-    <string name="widget_bb_name">Clash Timers Builder Base</string>
+    <string name="widget_bb_name">Clash Timer Builder Base</string>
     <string name="widget_bb_description">Builder Base builders and Star Laboratory</string>
 </resources>

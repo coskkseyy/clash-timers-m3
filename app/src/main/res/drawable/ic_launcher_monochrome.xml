@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Themed (Material You) icon: shield + clock badge; the gap around the clock is cut out -->
+<!-- Themed (Material You) icon: same shield and clock in one color -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
     <group>
-        <!-- whole canvas minus a 14-unit circle (opposite winding = hole) -->
-        <clip-path android:pathData="M0,0h108v108h-108zM66,52a14,14 0,1 0,0 28a14,14 0,1 0,0 -28z" />
-        <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.62" android:pathData="M51,28L71,34V50C71,62 63,71 51,76Z" />
-        <path android:fillColor="#FFFFFFFF" android:pathData="M51,28L31,34V50C31,62 39,71 51,76Z" />
+        <!-- everything except a gap around the clock badge -->
+        <clip-path android:pathData="M0,0h108v108h-108zM67,52.5a14.5,14.5 0,1 0,0 29.0a14.5,14.5 0,1 0,0 -29.0z" />
+        <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.62" android:pathData="M54,27L59,27Q62.5,27 63.5,30Q64.5,33 67,33L74,33Q79,33 79,38L79,53C79,67 68,77 54,82Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M54,27L49,27Q45.5,27 44.5,30Q43.5,33 41,33L34,33Q29,33 29,38L29,53C29,67 40,77 54,82Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="3.5" android:strokeLineJoin="round"
+            android:fillColor="#00000000" android:pathData="M29,38Q29,33 34,33L41,33Q43.5,33 44.5,30Q45.5,27 49,27L59,27Q62.5,27 63.5,30Q64.5,33 67,33L74,33Q79,33 79,38L79,53C79,67 68,77 54,82C40,77 29,67 29,53Z" />
     </group>
-    <!-- clock face with the hands cut out -->
+    <!-- clock face with the hands cut out (the hands are a stroked outline turned into a hole) -->
     <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
-        android:pathData="M66,55.5a10.5,10.5 0,1 1,0 21a10.5,10.5 0,1 1,0 -21zM64.7,59.5v7.2l5.1,3.2l1.4,-2.2l-3.9,-2.4v-5.8z" />
+        android:pathData="M67,56a11,11 0,1 1,0 22a11,11 0,1 1,0 -22zM65.6,60.5v7.3l5.1,3.1l1.4,-2.4l-3.7,-2.2v-5.8z" />
+
 </vector>

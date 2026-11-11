@@ -28,18 +28,18 @@ jobs:
         run: ./gradlew assembleRelease -PclashtimersSigning=$GITHUB_WORKSPACE/signing/keystore.properties
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk ClashTimers-M3.apk
+        run: cp app/build/outputs/apk/release/app-release.apk ClashTimer.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ClashTimers-M3
-          path: ClashTimers-M3.apk
+          name: ClashTimer
+          path: ClashTimer.apk
 
       - name: Publish to the "latest" release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          name: Clash Timers M3 (latest build)
+          name: Clash Timer (latest build)
           prerelease: true
           make_latest: true
-          files: ClashTimers-M3.apk
+          files: ClashTimer.apk
