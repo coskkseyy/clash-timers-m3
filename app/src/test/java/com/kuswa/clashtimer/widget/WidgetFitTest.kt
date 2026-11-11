@@ -9,7 +9,7 @@ class WidgetFitTest {
 
     @Test fun tallIsNormal() = assertEquals(Fit(false, 7, 2, 1, true), WidgetRenderer.fit(600, 7, 2, 1))
 
-    @Test fun mediumIsCompact() = assertEquals(Fit(true, 7, 2, 1, true), WidgetRenderer.fit(450, 7, 2, 1))
+    @Test fun mediumIsCompact() = assertEquals(Fit(true, 7, 2, 1, true), WidgetRenderer.fit(440, 7, 2, 1))
 
     @Test fun shortCutsLabAndPetsFirst() {
         val f = WidgetRenderer.fit(300, 7, 2, 1)

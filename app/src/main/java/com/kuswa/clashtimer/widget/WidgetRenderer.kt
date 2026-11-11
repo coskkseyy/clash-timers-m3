@@ -426,7 +426,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
 
 
         /** Estimated panel height in dp with 28 dp rows (see widget_root.xml / widget_row.xml). */
-        fun normalHeightDp(rows: Int): Int = 173 + 31 * rows
+        fun normalHeightDp(rows: Int): Int = 159 + 31 * rows
 
         /** Widget height in dp as reported by the launcher (portrait), or null if unknown. */
         fun reportedHeightDp(options: Bundle?): Int? =
@@ -440,11 +440,11 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             reportedHeightDp(options)?.let { it < normalHeightDp(rows) } ?: false
 
         // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
-        private const val FIT_BASE = 68      // panel padding (10 top, 18 bottom) + header
+        private const val FIT_BASE = 54      // panel padding (10 + 10) + header (~34)
         const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
         private const val FIT_ROW = 31
         private const val FIT_ROW_COMPACT = 27
-        private const val FIT_FOOTER = 20
+        private const val FIT_FOOTER = 18
 
         /** How many rows of each section are shown, and whether the footer is. */
         data class Fit(val compact: Boolean, val builders: Int, val lab: Int, val pets: Int, val footer: Boolean)
