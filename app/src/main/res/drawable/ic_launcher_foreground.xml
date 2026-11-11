@@ -1,46 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Gold stopwatch whose hand is a builder's hammer (original artwork) -->
+<!-- Stopwatch with a hammer hand, one flat color (same glyph as the themed icon) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- crown -->
-    <path android:pathData="M51,25h6a2,2 0,0 1,2 2v3a2,2 0,0 1,-2 2h-6a2,2 0,0 1,-2 -2v-3a2,2 0,0 1,2 -2z"
-        android:strokeColor="#FF6B4308" android:strokeWidth="2">
-        <aapt:attr name="android:fillColor">
-            <gradient android:type="linear" android:startX="54" android:startY="25" android:endX="54" android:endY="80">
-                <item android:offset="0" android:color="#FFFFE08A" />
-                <item android:offset="1" android:color="#FFE9A92A" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <path android:fillColor="#FF6B4308" android:pathData="M52,31h4v5h-4z" />
-    <!-- side button -->
-    <path android:strokeColor="#FF6B4308" android:strokeWidth="2.5" android:strokeLineCap="round" android:pathData="M68.5,43.5L71,41" />
-    <path android:pathData="M69.5,38.5l3,-3l3,3l-3,3z" android:strokeColor="#FF6B4308" android:strokeWidth="2" android:strokeLineJoin="round">
-        <aapt:attr name="android:fillColor">
-            <gradient android:type="linear" android:startX="54" android:startY="25" android:endX="54" android:endY="80">
-                <item android:offset="0" android:color="#FFFFE08A" />
-                <item android:offset="1" android:color="#FFE9A92A" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- body -->
-    <path android:pathData="M54,36a22,22 0,1 1,0 44a22,22 0,1 1,0 -44z" android:strokeColor="#FF6B4308" android:strokeWidth="3">
-        <aapt:attr name="android:fillColor">
-            <gradient android:type="linear" android:startX="54" android:startY="25" android:endX="54" android:endY="80">
-                <item android:offset="0" android:color="#FFFFE08A" />
-                <item android:offset="1" android:color="#FFE9A92A" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <path android:fillColor="#FFFFF6DE" android:strokeColor="#FFB9831C" android:strokeWidth="1.5"
-        android:pathData="M54,41.5a16.5,16.5 0,1 1,0 33a16.5,16.5 0,1 1,0 -33z" />
-    <!-- ticks -->
-    <path android:strokeColor="#FF8A5A10" android:strokeWidth="2.2" android:strokeLineCap="round"
+    <path android:fillColor="@color/icon_fg" android:pathData="M50,25h8v7h-2v4h-4v-4h-2z" />
+    <path android:strokeColor="@color/icon_fg" android:strokeWidth="2.5" android:strokeLineCap="round" android:pathData="M68.5,43.5L71,41" />
+    <path android:fillColor="@color/icon_fg" android:pathData="M69.5,38.5l3,-3l3,3l-3,3z" />
+    <path android:strokeColor="@color/icon_fg" android:strokeWidth="4" android:pathData="M54,37.5a20.5,20.5 0,1 1,0 41a20.5,20.5 0,1 1,0 -41z" />
+    <path android:strokeColor="@color/icon_fg" android:strokeWidth="2.2" android:strokeLineCap="round"
         android:pathData="M54,44.5v3M54,68.5v3M40.5,58h3M64.5,58h3" />
-    <!-- hammer hand -->
-    <path android:strokeColor="#FF7A4A1F" android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M47,66L60,53" />
-    <path android:strokeColor="#FF5B6470" android:strokeWidth="7.5" android:strokeLineCap="round" android:pathData="M56.2,47.2L66.8,57.8" />
-    <path android:strokeColor="#FFA7B1BC" android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M56.2,47.2L66.8,57.8" />
-    <path android:fillColor="#FF6B4308" android:pathData="M54,55.8a2.2,2.2 0,1 1,0 4.4a2.2,2.2 0,1 1,0 -4.4z" />
+    <path android:strokeColor="@color/icon_fg" android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M47,66L60,53" />
+    <path android:strokeColor="@color/icon_fg" android:strokeWidth="7.5" android:strokeLineCap="round" android:pathData="M56.2,47.2L66.8,57.8" />
 </vector>
