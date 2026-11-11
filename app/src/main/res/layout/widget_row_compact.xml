@@ -67,37 +67,23 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <LinearLayout
+                <FrameLayout
                     android:id="@+id/row_goblin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:background="@drawable/tag_goblin"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                                        android:visibility="gone">
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/btn_helper"
+                    android:visibility="gone">
 
+                    <!-- Goblin Builder / Researcher badge, same look as the helper badges. -->
                     <ImageView
                         android:id="@+id/row_goblin_icon"
-                        android:background="@drawable/badge_circle"
-                        android:padding="1.5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
                         android:scaleType="fitCenter"
-                        android:layout_marginEnd="2dp"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
                         android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/row_goblin_text"
-                        style="@style/WidgetSmallSans"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif"
-                        android:text="Goblin"
-                        android:textColor="@color/m_sub"
-                        android:textSize="7dp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/row_name"

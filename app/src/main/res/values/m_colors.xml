@@ -18,4 +18,6 @@
     <color name="m_outline">#FFCAC4D0</color>
     <color name="m_error">#FFB3261E</color>
     <dimen name="m_panel_radius">24dp</dimen>
+    <color name="icon_bg">#FF2B2930</color>
+    <color name="icon_fg">#FFEADDFF</color>
 </resources>
