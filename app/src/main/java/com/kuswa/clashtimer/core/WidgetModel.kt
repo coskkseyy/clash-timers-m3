@@ -347,10 +347,13 @@ object WidgetSchedule {
      * Epoch ms of the next re-render: the model's own next change, or the next countdown format edge
      * ([Countdown.segment]) with [liveCountdown], or the next change of the `1d 20h` text without it.
      */
-    fun nextUpdateMs(model: WidgetModel, nowMs: Long, liveCountdown: Boolean): Long? {
+    fun nextUpdateMs(model: WidgetModel, nowMs: Long, liveCountdown: Boolean): Long? =
+        listOfNotNull(model.nextChangeAt?.times(1000)?.takeIf { it > nowMs }, nextRowsUpdateMs(model.allRows, nowMs, liveCountdown)).minOrNull()
+
+    /** Next re-render needed by these rows alone (finishes and countdown format edges). */
+    fun nextRowsUpdateMs(rows: List<WidgetRow>, nowMs: Long, liveCountdown: Boolean): Long? {
         val candidates = buildList {
-            model.nextChangeAt?.let { add(it * 1000) }
-            model.allRows.filter { it.kind == RowKind.RUNNING && it.finishAt != null }.forEach { row ->
+            rows.filter { it.kind == RowKind.RUNNING && it.finishAt != null }.forEach { row ->
                 val finishAt = row.finishAt!!
                 // The row turns Completed GRACE_SEC before the finish, so the chronometer never reaches zero.
                 add((finishAt - Finish.GRACE_SEC) * 1000)

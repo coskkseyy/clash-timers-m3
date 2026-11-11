@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import com.kuswa.clashtimer.core.BuilderBase
 import com.kuswa.clashtimer.core.FinishNotices
 import com.kuswa.clashtimer.core.WidgetActions
 import com.kuswa.clashtimer.core.WidgetModelBuilder
@@ -101,6 +102,9 @@ open class ClashWidgetReceiver : AppWidgetProvider() {
 /** The 2x2 widget. Same broadcasts and redraws as the big one; only the layout differs. */
 class ClashMiniWidgetReceiver : ClashWidgetReceiver()
 
+/** The Builder Base widget. */
+class ClashBbWidgetReceiver : ClashWidgetReceiver()
+
 object WidgetUpdater {
 
     fun widgetIds(context: Context): IntArray =
@@ -108,6 +112,9 @@ object WidgetUpdater {
 
     fun miniWidgetIds(context: Context): IntArray =
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, ClashMiniWidgetReceiver::class.java))
+
+    fun bbWidgetIds(context: Context): IntArray =
+        AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, ClashBbWidgetReceiver::class.java))
 
     /**
      * Everything that follows a change or an alarm: posts "… free" notifications for jobs that just
@@ -152,20 +159,31 @@ object WidgetUpdater {
             val manager = AppWidgetManager.getInstance(app)
             val ids = widgetIds(app)
             val miniIds = miniWidgetIds(app)
-            if (ids.isEmpty() && miniIds.isEmpty()) {
+            val bbIds = bbWidgetIds(app)
+            if (ids.isEmpty() && miniIds.isEmpty() && bbIds.isEmpty()) {
                 WidgetAlarm.cancelRedraw(app)
                 return 0
             }
             val model = WidgetModelBuilder.build(state, settings, names, Times.get(app), now)
-            val renderer = WidgetRenderer(app)
+            val renderer = WidgetRenderer(app, settings.showFinishTime)
             for (id in ids) {
                 manager.updateAppWidget(id, renderer.render(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
             for (id in miniIds) {
                 manager.updateAppWidget(id, renderer.renderMini(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
-            WidgetAlarm.scheduleRedraw(app, WidgetSchedule.nextUpdateMs(model, nowMs, settings.liveCountdown))
-            ids.size + miniIds.size
+            val bbModel = if (bbIds.isNotEmpty()) BuilderBase.build(state, settings, names, Times.get(app), now) else null
+            for (id in bbIds) {
+                manager.updateAppWidget(id, renderer.renderBb(bbModel!!, settings.liveCountdown, manager.getAppWidgetOptions(id)))
+            }
+            WidgetAlarm.scheduleRedraw(
+                app,
+                listOfNotNull(
+                    WidgetSchedule.nextUpdateMs(model, nowMs, settings.liveCountdown),
+                    bbModel?.let { WidgetSchedule.nextRowsUpdateMs(it.allRows, nowMs, settings.liveCountdown) },
+                ).minOrNull(),
+            )
+            ids.size + miniIds.size + bbIds.size
         } catch (t: Throwable) {
             repo.log(source, false, "Widget refresh failed: ${t.javaClass.simpleName}: ${t.message}")
             -1

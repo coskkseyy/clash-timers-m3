@@ -6,6 +6,11 @@ object GameIds {
     const val BUILDERS_HUT = 1000015
     const val BOBS_HUT = 1000064
 
+    // Builder Base (clash-of-clans-data `data/builder`).
+    const val BUILDER_HALL = 1000034
+    const val STAR_LABORATORY = 1000046
+    const val OTTOS_OUTPOST = 1000078
+
     // Helper IDs, confirmed against clash-of-clans-data@0.19.1 (`data/home/other/helpers`).
     const val HELPER_BUILDERS_APPRENTICE = 93000000
     const val HELPER_LAB_ASSISTANT = 93000001

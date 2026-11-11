@@ -94,6 +94,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/clash_widget_mini_info" />
         </receiver>
+
+        <receiver
+            android:name=".widget.ClashBbWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_bb_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/clash_widget_bb_info" />
+        </receiver>
     </application>
 
 </manifest>

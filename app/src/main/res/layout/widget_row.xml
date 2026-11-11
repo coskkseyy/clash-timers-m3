@@ -75,14 +75,13 @@
                     android:background="@drawable/tag_goblin"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="4dp"
-                    android:paddingTop="1dp"
-                    android:paddingEnd="4dp"
-                    android:paddingBottom="1dp"
-                    android:visibility="gone">
+                                        android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/row_goblin_icon"
+                        android:background="@drawable/badge_circle"
+                        android:padding="1.5dp"
+                        android:scaleType="fitCenter"
                         android:layout_marginEnd="2dp"
                         android:layout_width="19dp"
                         android:layout_height="19dp"
@@ -95,7 +94,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
                         android:text="Goblin"
-                        android:textColor="@color/m_on_tert_cont"
+                        android:textColor="@color/m_sub"
                         android:textSize="8dp"
                         android:textStyle="bold" />
                 </LinearLayout>
