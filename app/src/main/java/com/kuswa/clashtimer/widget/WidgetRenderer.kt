@@ -70,20 +70,94 @@ class WidgetRenderer(private val context: Context) {
         pill(rv, PillIds(R.id.pill_ppot, R.id.pill_ppot_add, R.id.pill_ppot_undo, R.id.pill_ppot_icon, R.id.pill_ppot_text),
             model.petPotion, "pet_potion", R.drawable.ic_pet_potion)
 
-        val compact = useCompactRows(options, model.allRows.size)
+        val builderRows = model.builderRows.take(MAX_BUILDER_ROWS)
+        val labRows = model.labRows
+        val petRows = listOf(model.petRow)
+        val fit = fit(reportedHeightDp(options), builderRows.size, labRows.size, petRows.size)
+        val compact = fit.compact
         val nowMs = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtime()
         fun fill(@IdRes container: Int, rows: List<WidgetRow>) {
             rv.removeAllViews(container)
-            rows.take(MAX_BUILDER_ROWS).forEach { rv.addView(container, row(it, compact, liveCountdown, nowMs, elapsed)) }
+            rows.forEach { rv.addView(container, row(it, compact, liveCountdown, nowMs, elapsed)) }
         }
-        fill(R.id.rows_builders, model.builderRows)
-        fill(R.id.rows_lab, model.labRows)
-        fill(R.id.rows_pet, listOf(model.petRow))
+        // Rows are sorted soonest first, so a short widget keeps the most urgent ones.
+        fill(R.id.rows_builders, builderRows.take(fit.builders))
+        fill(R.id.rows_lab, labRows.take(fit.lab))
+        fill(R.id.rows_pet, petRows.take(fit.pets))
+        val labVis = if (fit.lab > 0) View.VISIBLE else View.GONE
+        val petVis = if (fit.pets > 0) View.VISIBLE else View.GONE
+        rv.setViewVisibility(R.id.section_lab, labVis)
+        rv.setViewVisibility(R.id.rows_lab, labVis)
+        rv.setViewVisibility(R.id.section_pets, petVis)
+        rv.setViewVisibility(R.id.rows_pet, petVis)
+        rv.setViewVisibility(R.id.footer, if (fit.footer) View.VISIBLE else View.GONE)
 
         rv.setTextViewText(R.id.foot_left, footer(model))
         rv.setTextViewText(R.id.foot_right, model.footerRight)
         return rv
+    }
+
+    /** The 2x2 widget: free-builder count, Sync, and the next jobs to finish as icon + countdown. */
+    fun renderMini(model: WidgetModel, liveCountdown: Boolean, options: Bundle?): RemoteViews {
+        val rv = RemoteViews(pkg, R.layout.widget_mini)
+        rv.setOnClickPendingIntent(R.id.mini_sync, syncIntent())
+        if (!model.hasData) {
+            rv.setTextViewText(R.id.mini_title, "Clash Timers")
+            rv.setViewVisibility(R.id.mini_rows, View.GONE)
+            rv.setViewVisibility(R.id.mini_empty, View.VISIBLE)
+            rv.setTextViewText(R.id.mini_empty, if (model.syncFailed) WidgetModelBuilder.SYNC_FAILED else WidgetModelBuilder.NO_DATA)
+            rv.setOnClickPendingIntent(R.id.mini_panel, syncIntent())
+            return rv
+        }
+        clashIntent()?.let { rv.setOnClickPendingIntent(R.id.mini_panel, it) }
+        rv.setTextViewText(R.id.mini_title, model.buildersLabel)
+
+        val nowMs = System.currentTimeMillis()
+        val elapsed = SystemClock.elapsedRealtime()
+        val count = miniRowCount(reportedHeightDp(options))
+        rv.removeAllViews(R.id.mini_rows)
+        miniRows(model).take(count).forEach { rv.addView(R.id.mini_rows, miniRow(it, liveCountdown, nowMs, elapsed)) }
+        return rv
+    }
+
+    private fun miniRow(model: WidgetRow, live: Boolean, nowMs: Long, elapsed: Long): RemoteViews {
+        val row = if (model.kind == RowKind.RUNNING && model.finishAt != null && Finish.isDone(model.finishAt, nowMs / 1000)) {
+            model.copy(kind = RowKind.COMPLETED, remaining = 0, progress = 1f)
+        } else {
+            model
+        }
+        val v = RemoteViews(pkg, R.layout.widget_row_mini)
+        val iconPx = (18 * density).roundToInt()
+        row.iconIds.firstNotNullOfOrNull { icons.bitmap(it.toString(), iconPx) }?.let { v.setImageViewBitmap(R.id.row_icon, it) }
+        if (row.goblin) {
+            icons.bitmap("goblin", (14 * density).roundToInt())?.let {
+                v.setImageViewBitmap(R.id.row_goblin_icon, it)
+                v.setViewVisibility(R.id.row_goblin_icon, View.VISIBLE)
+            }
+        }
+        when (row.kind) {
+            RowKind.RUNNING -> {
+                v.setProgressBar(R.id.row_fill, 1000, (row.progress * 1000).roundToInt(), false)
+                val segment = if (live) row.finishAt?.let { Countdown.segment(it, nowMs) } else null
+                if (segment != null) {
+                    v.setChronometer(R.id.row_chrono, elapsed + segment.chronometerMs, segment.format, true)
+                    v.setChronometerCountDown(R.id.row_chrono, true)
+                } else {
+                    v.setViewVisibility(R.id.row_chrono, View.GONE)
+                    v.setViewVisibility(R.id.row_text, View.VISIBLE)
+                    v.setTextViewText(R.id.row_text, row.staticStatus)
+                }
+            }
+            RowKind.COMPLETED, RowKind.IDLE -> {
+                v.setViewVisibility(R.id.row_fill, View.GONE)
+                v.setInt(R.id.row, "setBackgroundResource", R.drawable.row_done)
+                v.setViewVisibility(R.id.row_chrono, View.GONE)
+                v.setViewVisibility(R.id.row_text, View.VISIBLE)
+                v.setTextViewText(R.id.row_text, if (row.kind == RowKind.COMPLETED) "Done" else row.staticStatus)
+            }
+        }
+        return v
     }
 
     private fun row(model: WidgetRow, compact: Boolean, live: Boolean, nowMs: Long, elapsed: Long): RemoteViews {
@@ -109,12 +183,11 @@ class WidgetRenderer(private val context: Context) {
         if (row.goblin) {
             v.setViewVisibility(R.id.row_goblin, View.VISIBLE)
             // No Goblin Builder art exists in the data package; the Goblin troop portrait stands in.
-            // With an icon the tag is just the face; the word only shows if no image is found.
+            // Face first, then a small "Goblin" note.
             val goblinPx = ((if (compact) 16 else 19) * density).roundToInt()
             (icons.bitmap("goblin", goblinPx) ?: icons.bitmap(GOBLIN_TROOP_ID, goblinPx))?.let {
                 v.setImageViewBitmap(R.id.row_goblin_icon, it)
                 v.setViewVisibility(R.id.row_goblin_icon, View.VISIBLE)
-                v.setViewVisibility(R.id.row_goblin_text, View.GONE)
             }
         }
         v.setTextViewText(R.id.row_name, row.name)
@@ -286,6 +359,52 @@ class WidgetRenderer(private val context: Context) {
         /** 25 dp rows when the launcher says 30 dp rows won't fit. */
         fun useCompactRows(options: Bundle?, rows: Int): Boolean =
             reportedHeightDp(options)?.let { it < normalHeightDp(rows) } ?: false
+
+        // Height estimates in dp, matching widget_root.xml / widget_row*.xml.
+        private const val FIT_BASE = 60      // panel padding + header
+        private const val FIT_SECTION = 29   // BUILDERS / LAB / PETS line with its pills
+        private const val FIT_ROW = 33
+        private const val FIT_ROW_COMPACT = 27
+        private const val FIT_FOOTER = 20
+
+        /** How many rows of each section are shown, and whether the footer is. */
+        data class Fit(val compact: Boolean, val builders: Int, val lab: Int, val pets: Int, val footer: Boolean)
+
+        /**
+         * Everything at 30 dp rows if it fits, else everything at 25 dp, else 25 dp rows cut so
+         * nothing is clipped: builders first, then lab, then pets (a section needs room for its
+         * line and one row), then the footer. Unknown height = show everything.
+         */
+        fun fit(heightDp: Int?, builders: Int, lab: Int, pets: Int): Fit {
+            val all = Fit(false, builders, lab, pets, true)
+            if (heightDp == null) return all
+            val fixed = FIT_BASE + 3 * FIT_SECTION + FIT_FOOTER
+            val n = builders + lab + pets
+            if (fixed + n * FIT_ROW <= heightDp) return all
+            if (fixed + n * FIT_ROW_COMPACT <= heightDp) return all.copy(compact = true)
+            var budget = heightDp - FIT_BASE - FIT_SECTION
+            val b = (budget / FIT_ROW_COMPACT).coerceIn(0, builders)
+            budget -= b * FIT_ROW_COMPACT
+            fun section(rows: Int): Int {
+                if (rows == 0 || budget < FIT_SECTION + FIT_ROW_COMPACT) return 0
+                val k = ((budget - FIT_SECTION) / FIT_ROW_COMPACT).coerceIn(1, rows)
+                budget -= FIT_SECTION + k * FIT_ROW_COMPACT
+                return k
+            }
+            val l = if (b == builders) section(lab) else 0
+            val p = if (l == lab) section(pets) else 0
+            return Fit(true, b, l, p, b == builders && l == lab && p == pets && budget >= FIT_FOOTER)
+        }
+
+        /** 2x2 rows: done first, then idle lab / pet house, then running soonest first. */
+        fun miniRows(model: WidgetModel): List<WidgetRow> = model.allRows.sortedWith(
+            compareBy<WidgetRow> {
+                when (it.kind) { RowKind.COMPLETED -> 0; RowKind.IDLE -> 1; RowKind.RUNNING -> 2 }
+            }.thenBy { it.finishAt ?: Long.MAX_VALUE },
+        )
+
+        /** 2x2: header ~30 dp + panel padding, 27 dp per row. Unknown height = 4 rows. */
+        fun miniRowCount(heightDp: Int?): Int = heightDp?.let { ((it - 46) / 27).coerceIn(2, 8) } ?: 4
     }
 }
 

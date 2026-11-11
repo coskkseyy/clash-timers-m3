@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One 2x2 row (24 dp): icon, optional Goblin face, countdown on the right, progress behind. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/row_slot">
+
+    <ProgressBar
+        android:id="@+id/row_fill"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:indeterminate="false"
+        android:indeterminateOnly="false"
+        android:max="1000"
+        android:maxHeight="200dp"
+        android:minHeight="0dp"
+        android:progress="0"
+        android:progressDrawable="@drawable/row_fill" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/row_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="4dp"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/row_goblin_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingEnd="8dp">
+
+            <Chronometer
+                android:id="@+id/row_chrono"
+                style="@style/WidgetText.Time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:countDown="true"
+                android:textSize="12dp" />
+
+            <TextView
+                android:id="@+id/row_text"
+                style="@style/WidgetText.Time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:textSize="12dp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>
