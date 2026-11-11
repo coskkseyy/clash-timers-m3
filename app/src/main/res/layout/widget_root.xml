@@ -220,6 +220,7 @@
 
             <!-- LAB   [+1] -->
             <LinearLayout
+                android:id="@+id/section_lab"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
@@ -305,6 +306,7 @@
 
             <!-- PETS   [+1] -->
             <LinearLayout
+                android:id="@+id/section_pets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
@@ -390,6 +392,7 @@
 
             <!-- Footer: helper status left, sync age right. -->
             <LinearLayout
+                android:id="@+id/footer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"

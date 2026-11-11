@@ -83,6 +83,7 @@
 
                     <ImageView
                         android:id="@+id/row_goblin_icon"
+                        android:layout_marginEnd="2dp"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:visibility="gone" />
@@ -93,9 +94,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
-                        android:text="GOBLIN"
+                        android:text="Goblin"
                         android:textColor="@color/m_on_tert_cont"
-                        android:textSize="8dp"
+                        android:textSize="7dp"
                         android:textStyle="bold" />
                 </LinearLayout>
 

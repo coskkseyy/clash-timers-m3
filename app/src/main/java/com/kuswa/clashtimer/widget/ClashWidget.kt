@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
  * Also the app's single broadcast entry point: widget button taps (step 5), the redraw and
  * finish alarms, and boot / app update / clock change, which all end in [WidgetUpdater.updateAll].
  */
-class ClashWidgetReceiver : AppWidgetProvider() {
+open class ClashWidgetReceiver : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) = refresh(context, "widget")
 
@@ -49,7 +49,8 @@ class ClashWidgetReceiver : AppWidgetProvider() {
         }
     }
 
-    override fun onDisabled(context: Context) = WidgetAlarm.cancelRedraw(context)
+    // Re-render instead of cancelling: the other widget size may still be placed (updateAll cancels if none are).
+    override fun onDisabled(context: Context) = refresh(context, "widget")
 
     private fun refresh(context: Context, source: String) = runAsync { WidgetUpdater.updateAll(context, source) }
 
@@ -97,10 +98,16 @@ class ClashWidgetReceiver : AppWidgetProvider() {
     }
 }
 
+/** The 2x2 widget. Same broadcasts and redraws as the big one; only the layout differs. */
+class ClashMiniWidgetReceiver : ClashWidgetReceiver()
+
 object WidgetUpdater {
 
     fun widgetIds(context: Context): IntArray =
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, ClashWidgetReceiver::class.java))
+
+    fun miniWidgetIds(context: Context): IntArray =
+        AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, ClashMiniWidgetReceiver::class.java))
 
     /**
      * Everything that follows a change or an alarm: posts "… free" notifications for jobs that just
@@ -144,7 +151,8 @@ object WidgetUpdater {
 
             val manager = AppWidgetManager.getInstance(app)
             val ids = widgetIds(app)
-            if (ids.isEmpty()) {
+            val miniIds = miniWidgetIds(app)
+            if (ids.isEmpty() && miniIds.isEmpty()) {
                 WidgetAlarm.cancelRedraw(app)
                 return 0
             }
@@ -153,8 +161,11 @@ object WidgetUpdater {
             for (id in ids) {
                 manager.updateAppWidget(id, renderer.render(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
+            for (id in miniIds) {
+                manager.updateAppWidget(id, renderer.renderMini(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
+            }
             WidgetAlarm.scheduleRedraw(app, WidgetSchedule.nextUpdateMs(model, nowMs, settings.liveCountdown))
-            ids.size
+            ids.size + miniIds.size
         } catch (t: Throwable) {
             repo.log(source, false, "Widget refresh failed: ${t.javaClass.simpleName}: ${t.message}")
             -1
