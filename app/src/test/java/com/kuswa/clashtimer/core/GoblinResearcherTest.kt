@@ -49,6 +49,6 @@ class GoblinResearcherTest {
     @Test fun finishNotice() {
         val e = (ExportParser.parse(text) as ParseResult.Success).export
         val notice = FinishNotices.notice(e.labJobs.single { it.isGoblin }, names)
-        assertTrue(notice.heading, notice.heading.startsWith("Goblin Researcher done"))
+        assertTrue(notice.title, notice.title.startsWith("Goblin Researcher done"))
     }
 }
