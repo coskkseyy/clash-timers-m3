@@ -35,6 +35,8 @@ object SyncLogic {
             BoostType.BUILDER_POTION to export.builderBoostRemaining,
             BoostType.RESEARCH_POTION to export.researchBoostRemaining,
             BoostType.PET_POTION to export.petBoostRemaining,
+            BoostType.BUILDER_BITE to export.biteBoostRemaining,
+            BoostType.STUDY_SOUP to export.soupBoostRemaining,
         )) {
             if (left == null) continue
             boosts = boosts.filterNot { it.type == type } + BoostUse(type, export.timestamp, export.timestamp + left)

@@ -32,6 +32,10 @@ data class WidgetModel(
     val builderPotion: BoostPill,
     val researchPotion: BoostPill,
     val petPotion: BoostPill,
+    /** Study Soup: shown on both the lab and the pets line (it speeds up both). */
+    val soup: BoostPill,
+    /** The event Goblin Researcher's job is still running: lab line shows `+ Goblin`. */
+    val goblinResearching: Boolean = false,
     /** One row per builder job (finished ones say Completed); free builders get no rows. */
     val builderRows: List<WidgetRow>,
     val labRow: WidgetRow,
@@ -146,6 +150,7 @@ object WidgetModelBuilder {
                 buildersBusy = 0, buildersTotal = settings.totalBuilders(null), goblinWorking = false,
                 bite = pills(BoostType.BUILDER_BITE), builderPotion = pills(BoostType.BUILDER_POTION),
                 researchPotion = pills(BoostType.RESEARCH_POTION), petPotion = pills(BoostType.PET_POTION),
+                soup = pills(BoostType.STUDY_SOUP), goblinResearching = false,
                 builderRows = emptyList(),
                 labRow = idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY), petRow = idleRow(Lang.t("Pet House", "Evcil Hayvan Evi"), PET_HOUSE),
                 footerLeft = if (state.syncFailed) listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR)) else emptyList(),
@@ -230,6 +235,8 @@ object WidgetModelBuilder {
             builderPotion = pills(BoostType.BUILDER_POTION),
             researchPotion = pills(BoostType.RESEARCH_POTION),
             petPotion = pills(BoostType.PET_POTION),
+            soup = pills(BoostType.STUDY_SOUP),
+            goblinResearching = export.labJobs.any { it.isGoblin && running(it) },
             builderRows = builderRows,
             labRow = labRow,
             petRow = petRow,

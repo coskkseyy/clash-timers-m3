@@ -63,6 +63,9 @@ data class VillageExport(
     val researchBoostRemaining: Long? = null,
     /** `boosts.pet_boost` (or a variant): seconds left on a running pet potion at T0, or null. */
     val petBoostRemaining: Long? = null,
+    /** Running Builder Bite / Study Soup at T0 (export key names are guesses), or null. */
+    val biteBoostRemaining: Long? = null,
+    val soupBoostRemaining: Long? = null,
     /** Every key of the export's `boosts` object, shown in the sync message for debugging. */
     val boostKeys: List<String> = emptyList(),
     /** Builder Base upgrades (`buildings2`, `traps2`, `heroes2` → BUILDER; `units2` → LAB). */

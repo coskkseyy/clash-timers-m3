@@ -75,6 +75,7 @@ object WidgetActions {
         BoostType.BUILDER_BITE.name -> "Builder Bite"
         BoostType.RESEARCH_POTION.name -> "Research potion"
         BoostType.PET_POTION.name -> "Pet potion"
+        BoostType.STUDY_SOUP.name -> "Study Soup"
         else -> arg
     }
 }

@@ -87,6 +87,10 @@ fun SettingsSection(
         HoursStepper(Lang.t("Builder Bite", "İnşaatçı Atıştırması"), b.builderBiteSavingSec, 1..23) { v -> boosts { it.copy(builderBiteSavingSec = v) } }
         HoursStepper(Lang.t("Research potion", "Araştırma iksiri"), b.researchPotionSavingSec, 1..47) { v -> boosts { it.copy(researchPotionSavingSec = v) } }
         HoursStepper(Lang.t("Pet potion", "Evcil hayvan iksiri"), b.petPotionSavingSec, 1..47) { v -> boosts { it.copy(petPotionSavingSec = v) } }
+        HoursStepper("Study Soup", b.studySoupSavingSec, 1..23) { v -> boosts { it.copy(studySoupSavingSec = v) } }
+        SwitchRow(Lang.t("Study Soup also speeds up the Pet House", "Study Soup evcil hayvan evini de hızlandırır"), b.soupAppliesToPets) { on ->
+            boosts { it.copy(soupAppliesToPets = on) }
+        }
 
         Text(Lang.t("Helpers", "Yardımcılar"), style = MaterialTheme.typography.labelLarge)
         AutoHoursStepper(

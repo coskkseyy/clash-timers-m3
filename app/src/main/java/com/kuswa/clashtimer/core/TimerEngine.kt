@@ -32,6 +32,10 @@ data class BoostSettings(
     val helperWindowSec: Long = HOUR,
     /** Time from one helper session's start to the next: 23 h, not 24 h. */
     val helperPeriodSec: Long = DEFAULT_HELPER_PERIOD_SEC,
+    /** Study Soup: lab work saved per hour of soup (4x speed = 3 h extra per hour). */
+    val studySoupSavingSec: Long = 3 * HOUR,
+    /** Study Soup also speeds up the Pet House (as Cosk sees it in game). */
+    val soupAppliesToPets: Boolean = true,
     /** Builder potions and snacks also speed up the event Goblin Builder's job (assumed). */
     val boostsApplyToGoblin: Boolean = true,
 ) {
@@ -40,7 +44,12 @@ data class BoostSettings(
         BoostType.BUILDER_BITE -> builderBiteSavingSec
         BoostType.RESEARCH_POTION -> researchPotionSavingSec
         BoostType.PET_POTION -> petPotionSavingSec
+        BoostType.STUDY_SOUP -> studySoupSavingSec
     }
+
+    /** Whether a boost of [type] speeds up jobs of [category]. */
+    fun applies(type: BoostType, category: JobCategory): Boolean =
+        type.category == category || (type == BoostType.STUDY_SOUP && soupAppliesToPets && category == JobCategory.PET)
 }
 
 /** Tap-activated boosts. Each applies to every busy job of its category. */
@@ -50,6 +59,7 @@ enum class BoostType(val category: JobCategory) {
     BUILDER_BITE(JobCategory.BUILDER),
     RESEARCH_POTION(JobCategory.LAB),
     PET_POTION(JobCategory.PET),
+    STUDY_SOUP(JobCategory.LAB),
 }
 
 /** One potion/snack window, [start, end). */
@@ -149,7 +159,7 @@ class TimerEngine(val settings: BoostSettings = BoostSettings()) {
         val result = mutableListOf<SpeedBoost>()
         val dur = settings.boostDurationSec.toDouble()
         val potionsApply = !job.isGoblin || settings.boostsApplyToGoblin
-        boosts.filter { potionsApply && it.type.category == job.category }.forEach { use ->
+        boosts.filter { potionsApply && settings.applies(it.type, job.category) }.forEach { use ->
             result += FixedWindow(use.start, use.end, settings.savingFor(use.type) / dur)
         }
         result += helperWindows(job, export, links)

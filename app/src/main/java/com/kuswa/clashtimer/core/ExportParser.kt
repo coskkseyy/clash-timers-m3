@@ -93,6 +93,9 @@ object ExportParser {
         fun firstBoost(vararg keys: String): Long? = keys.firstNotNullOfOrNull { boostsObj?.long(it)?.takeIf { v -> v > 0 } }
         val researchBoost = firstBoost("lab_boost", "research_boost", "laboratory_boost")
         val petBoost = firstBoost("pet_boost", "pet_house_boost", "pethouse_boost")
+        // Snacks: names unknown, these are guesses; the sync message lists the real keys.
+        val biteBoost = firstBoost("builder_bite", "builder_bite_boost", "bite_boost", "builder_snack", "builder_snack_boost")
+        val soupBoost = firstBoost("study_soup", "study_soup_boost", "soup_boost", "lab_snack", "research_snack", "lab_snack_boost")
         val boostKeys = boostsObj?.keys?.sorted() ?: emptyList()
         // Seconds until the free daily Clock Tower boost can be used again (absent = ready).
         val clockTowerCooldown = (root["boosts"] as? JsonObject)?.long("clocktower_cooldown")?.takeIf { it > 0 }
@@ -115,6 +118,8 @@ object ExportParser {
                 builderBoostRemaining = builderBoost,
                 researchBoostRemaining = researchBoost,
                 petBoostRemaining = petBoost,
+                biteBoostRemaining = biteBoost,
+                soupBoostRemaining = soupBoost,
                 boostKeys = boostKeys,
                 bbJobs = assignOccurrences(bbJobs),
                 builderHallLevel = builderHall,

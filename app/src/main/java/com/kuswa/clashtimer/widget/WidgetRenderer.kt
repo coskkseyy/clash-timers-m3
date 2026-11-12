@@ -51,7 +51,6 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         rv.setOnClickPendingIntent(R.id.sync_button, sync)
         rv.setTextViewText(R.id.who, title(model))
         rv.setTextViewText(R.id.sync_text, "Sync")
-        rv.setTextViewText(R.id.label_lab, Lang.t("LAB", "LABORATUVAR"))
         rv.setTextViewText(R.id.label_pets, Lang.t("PETS", "EVCİL HAYVANLAR"))
         rv.setTextViewText(R.id.empty_hint, Lang.t("Clash: Settings, Data Export, Copy", "Clash: Ayarlar, Veri Dışa Aktarma, Kopyala"))
 
@@ -76,6 +75,12 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             model.researchPotion, "research_potion", R.drawable.ic_research_potion)
         pill(rv, PillIds(R.id.pill_ppot, R.id.pill_ppot_add, R.id.pill_ppot_undo, R.id.pill_ppot_icon, R.id.pill_ppot_text),
             model.petPotion, "pet_potion", R.drawable.ic_pet_potion)
+        // Study Soup speeds up the lab and the pets, so the same pill sits on both lines.
+        pill(rv, PillIds(R.id.pill_soupl, R.id.pill_soupl_add, R.id.pill_soupl_undo, R.id.pill_soupl_icon, R.id.pill_soupl_text),
+            model.soup, "study_soup", R.drawable.ic_research_potion)
+        pill(rv, PillIds(R.id.pill_soupp, R.id.pill_soupp_add, R.id.pill_soupp_undo, R.id.pill_soupp_icon, R.id.pill_soupp_text),
+            model.soup, "study_soup", R.drawable.ic_research_potion)
+        rv.setTextViewText(R.id.label_lab, labLabel(model))
 
         val builderRows = model.builderRows.take(MAX_BUILDER_ROWS)
         val labRows = model.labRows
@@ -345,6 +350,17 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             sb.append(" TH$th")
             sb.setSpan(AbsoluteSizeSpan(12, true), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sb.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        return sb
+    }
+
+    /** `LAB` + tertiary ` + Goblin` while the Goblin Researcher works. */
+    private fun labLabel(model: WidgetModel): CharSequence {
+        val sb = SpannableStringBuilder(Lang.t("LAB", "LABORATUVAR"))
+        if (model.goblinResearching) {
+            val start = sb.length
+            sb.append(" + Goblin")
+            sb.setSpan(ForegroundColorSpan(color(R.color.m_tertiary)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         return sb
     }

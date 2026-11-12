@@ -242,6 +242,65 @@
                     android:text="LAB" />
 
                 <LinearLayout
+                    android:id="@+id/pill_soupl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/pill_off"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Tap: one more hour (stacked after a running one). -->
+                    <LinearLayout
+                        android:id="@+id/pill_soupl_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="7dp"
+                        android:paddingEnd="7dp">
+
+                        <ImageView
+                            android:id="@+id/pill_soupl_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_research_potion" />
+
+                        <TextView
+                            android:id="@+id/pill_soupl_text"
+                            style="@style/WidgetText.Pill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+1" />
+                    </LinearLayout>
+
+                    <!-- Small "−": undo the last hour. Shown only while a boost of this type runs or is queued. -->
+                    <LinearLayout
+                        android:id="@+id/pill_soupl_undo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingEnd="6dp"
+                        android:visibility="gone">
+
+                        <!-- ImageView, not View: RemoteViews only inflates whitelisted classes. -->
+                        <ImageView
+                            android:layout_width="1dp"
+                            android:layout_height="12dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/pill_divider" />
+
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_minus" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/pill_rpot"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
@@ -327,6 +386,65 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="PETS" />
+
+                <LinearLayout
+                    android:id="@+id/pill_soupp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/pill_off"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Tap: one more hour (stacked after a running one). -->
+                    <LinearLayout
+                        android:id="@+id/pill_soupp_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="7dp"
+                        android:paddingEnd="7dp">
+
+                        <ImageView
+                            android:id="@+id/pill_soupp_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_research_potion" />
+
+                        <TextView
+                            android:id="@+id/pill_soupp_text"
+                            style="@style/WidgetText.Pill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+1" />
+                    </LinearLayout>
+
+                    <!-- Small "−": undo the last hour. Shown only while a boost of this type runs or is queued. -->
+                    <LinearLayout
+                        android:id="@+id/pill_soupp_undo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingEnd="6dp"
+                        android:visibility="gone">
+
+                        <!-- ImageView, not View: RemoteViews only inflates whitelisted classes. -->
+                        <ImageView
+                            android:layout_width="1dp"
+                            android:layout_height="12dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/pill_divider" />
+
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_minus" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/pill_ppot"
