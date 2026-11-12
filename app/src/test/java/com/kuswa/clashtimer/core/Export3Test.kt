@@ -167,7 +167,7 @@ class Export3Test {
         assertTrue(m.goblinWorking)
         assertEquals("2m", m.builderPotion.text) // 67 s, minutes rounded up
         assertTrue(m.builderPotion.active)
-        assertEquals("Bite" to false, m.bite.text to m.bite.active)
+        assertEquals("+1" to false, m.bite.text to m.bite.active)
         assertEquals("+1" to false, m.researchPotion.text to m.researchPotion.active)
         assertEquals("+1", m.petPotion.text)
         // Countdowns include the 67 s builder potion (603 s earlier for every builder job).

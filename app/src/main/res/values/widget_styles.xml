@@ -38,7 +38,7 @@
     <style name="WidgetText.Section">
         <item name="android:textSize">12dp</item>
         <item name="android:textColor">@color/m_primary</item>
-        <item name="android:letterSpacing">0.08</item>
+        <item name="android:letterSpacing">0.04</item>
     </style>
 
     <style name="WidgetText.Pill">

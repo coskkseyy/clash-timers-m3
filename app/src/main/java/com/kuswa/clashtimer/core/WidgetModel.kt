@@ -53,7 +53,7 @@ data class WidgetModel(
      */
     val nextChangeAt: Long?,
 ) {
-    val buildersLabel: String get() = Lang.t("BUILDERS", "İNŞAATÇILAR") + " $buildersBusy/$buildersTotal"
+    val buildersLabel: String get() = Lang.t("BUILDERS", "İNŞAAT") + " $buildersBusy/$buildersTotal"
     val title: String get() = townHall?.let { "$playerName TH$it" } ?: playerName
     val labRows: List<WidgetRow> get() = listOf(labRow) + goblinLabRows
     val allRows: List<WidgetRow> get() = builderRows + labRows + petRow
@@ -69,7 +69,7 @@ data class BoostPill(
     val active: Boolean get() = secondsLeft != null
     val text: String
         get() = secondsLeft?.let(WidgetModelBuilder::formatPill)
-            ?: if (type == BoostType.BUILDER_BITE) Lang.t("Bite", "Atıştırma") else "+1"
+            ?: "+1"
 }
 
 enum class FooterTone { NORMAL, IDLE, ERROR }
