@@ -1,5 +1,6 @@
 package com.kuswa.clashtimer.core
 
+import java.time.ZoneId
 import kotlin.math.ceil
 
 /**
@@ -139,6 +140,7 @@ object WidgetModelBuilder {
         names: NameMap,
         times: UpgradeTimes,
         now: Long,
+        zone: ZoneId = ZoneId.systemDefault(),
     ): WidgetModel {
         val export = state.export
         val pills = { type: BoostType ->
@@ -203,12 +205,14 @@ object WidgetModelBuilder {
         val goblinLabRows = sorted(export.labJobs.filter { it.isGoblin && running(it) }).map(::row)
         val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Pet House", "Hayvan Barınağı"), PET_HOUSE)
 
+        val apprenticeJob = runningJob(state.links.apprenticeJobKey, export, ::running)
+        val assistantJob = runningJob(state.links.labAssistantJobKey, export, ::running)
         val footerLeft = if (state.syncFailed) {
             listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR))
         } else {
             helperStatus(
-                apprentice = runningJob(state.links.apprenticeJobKey, export, ::running)?.let { shortName(it, names) },
-                assistant = runningJob(state.links.labAssistantJobKey, export, ::running)?.let { shortName(it, names) },
+                apprentice = helperState(export.helper(GameIds.HELPER_BUILDERS_APPRENTICE), apprenticeJob, export, settings.boosts, now, zone),
+                assistant = helperState(export.helper(GameIds.HELPER_LAB_ASSISTANT), assistantJob, export, settings.boosts, now, zone),
             )
         }
 
@@ -222,6 +226,8 @@ object WidgetModelBuilder {
             state.boosts.filter { it.end > now }.forEach { add(if (it.start > now) it.start else it.end) }
             BoostType.entries.forEach { type -> boostLeft(state.boosts, type, now)?.let { add(now + pillEdgeIn(it)) } }
             add(export.timestamp + agoEdge(now - export.timestamp))
+            export.helper(GameIds.HELPER_BUILDERS_APPRENTICE)?.let { addAll(helperEdges(it, apprenticeJob, export, settings.boosts, now)) }
+            export.helper(GameIds.HELPER_LAB_ASSISTANT)?.let { addAll(helperEdges(it, assistantJob, export, settings.boosts, now)) }
         }
 
         return WidgetModel(
@@ -259,26 +265,63 @@ object WidgetModelBuilder {
     private fun runningJob(key: String?, export: VillageExport, running: (Job) -> Boolean): Job? =
         key?.let { k -> export.jobs.firstOrNull { it.key == k } }?.takeIf(running)
 
-    /** Heroes by their title (`King`, `Champion`), everything else by its full name. */
-    private fun shortName(job: Job, names: NameMap): String {
-        val title = names.title(job)
-        return if (job.source == JobSource.HERO) title.substringAfterLast(' ') else title
+    /** What the footer says about one helper: `ready`, `active`, or the clock time it is available again. */
+    data class HelperState(val text: String, val idle: Boolean)
+
+    /**
+     * When [helper] can be used. A helper with no running job is `ready` once its cooldown (from the
+     * export) is over, else it says when that will be. One linked to a running job repeats a session
+     * every `helperPeriodSec` from the end of the cooldown, so it says `active` during a session and
+     * otherwise when the next one starts.
+     */
+    fun helperState(helper: Helper?, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long, zone: ZoneId): HelperState? {
+        helper ?: return null
+        val first = export.timestamp + helper.cooldown
+        if (linked == null) {
+            return if (first <= now) HelperState(Lang.t("ready", "hazır"), idle = true)
+            else HelperState(FinishClock.format(first, now, zone), idle = false)
+        }
+        val window = boosts.helperWindowSec
+        val period = boosts.helperPeriodSec.coerceAtLeast(window)
+        val running = (linked.helperTimer > 0 && now < export.timestamp + linked.helperTimer) ||
+            (first <= now && (now - first) % period < window)
+        if (running) return HelperState(Lang.t("active", "aktif"), idle = false)
+        val next = if (first > now) first else first + ((now - first) / period + 1) * period
+        return HelperState(FinishClock.format(next, now, zone), idle = false)
+    }
+
+    /** Times after which [helperState] changes: cooldown over, a session starting or ending. */
+    private fun helperEdges(helper: Helper, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long): List<Long> = buildList {
+        val first = export.timestamp + helper.cooldown
+        if (first > now) add(first)
+        if (linked == null) return@buildList
+        val window = boosts.helperWindowSec
+        val period = boosts.helperPeriodSec.coerceAtLeast(window)
+        if (linked.helperTimer > 0) add(export.timestamp + linked.helperTimer)
+        if (first > now) {
+            add(first + window)
+        } else {
+            val start = first + (now - first) / period * period
+            add(start + window)
+            add(start + period)
+        }
     }
 
     /**
-     * `Apprentice idle · Assistant idle`, `Apprentice idle · Assistant: Baby Dragon`,
-     * `Helpers: King · Baby Dragon`. Idle parts are drawn in orange.
+     * `Helpers: 03:20` when both are the same, else `Apprentice 03:20 · Assistant ready`
+     * (a helper that is ready but unused is drawn in orange). Empty if the export has no helpers.
      */
-    fun helperStatus(apprentice: String?, assistant: String?): List<FooterPart> =
-        if (apprentice != null && assistant != null) {
-            listOf(FooterPart(Lang.t("Helpers: ", "Yardımcılar: ") + "$apprentice · $assistant"))
-        } else {
-            listOf(
-                apprentice?.let { FooterPart(Lang.t("Apprentice: ", "Çırak: ") + it) } ?: FooterPart(Lang.t("Apprentice idle", "Çırak boşta"), FooterTone.IDLE),
-                FooterPart(" · "),
-                assistant?.let { FooterPart(Lang.t("Assistant: ", "Asistan: ") + it) } ?: FooterPart(Lang.t("Assistant idle", "Asistan boşta"), FooterTone.IDLE),
-            )
+    fun helperStatus(apprentice: HelperState?, assistant: HelperState?): List<FooterPart> {
+        fun tone(h: HelperState) = if (h.idle) FooterTone.IDLE else FooterTone.NORMAL
+        if (apprentice != null && assistant != null && apprentice == assistant) {
+            return listOf(FooterPart(Lang.t("Helpers: ", "Yardımcılar: ") + apprentice.text, tone(apprentice)))
         }
+        val parts = listOfNotNull(
+            apprentice?.let { FooterPart(Lang.t("Apprentice ", "Çırak ") + it.text, tone(it)) },
+            assistant?.let { FooterPart(Lang.t("Assistant ", "Asistan ") + it.text, tone(it)) },
+        )
+        return parts.flatMapIndexed { i, p -> if (i == 0) listOf(p) else listOf(FooterPart(" · "), p) }
+    }
 
     /** `IT` for Inferno Tower, `S` for Scattershot (first letters of the first two words). */
     fun initials(name: String): String =

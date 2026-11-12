@@ -52,7 +52,8 @@ class WidgetModelTest {
         assertEquals(RowButton.LAB_ASSISTANT, m.labRow.button)
         assertEquals("Spirit Fox → 8" to "2d 17h", m.petRow.let { it.label to it.staticStatus })
 
-        assertEquals(listOf(FooterPart("Helpers: Cake-A-Pult Damage · Dragon")), m.footerLeft)
+        // Both helpers are on a job and start their next session at T0 + 72189 (the export's cooldown).
+        assertEquals(listOf(FooterPart("Helpers: " + FinishClock.format(t0 + 72189, t0 + 3600))), m.footerLeft)
         assertEquals("synced 1h ago", m.footerRight)
         assertFalse(m.syncFailed)
     }
@@ -90,8 +91,9 @@ class WidgetModelTest {
         assertEquals(COMPLETED, module.staticStatus)
         assertEquals(1f, module.progress)
         assertEquals(RowButton.NONE, module.button)
+        // The Apprentice's job is done: its cooldown is over and it is unused. The Lab Assistant's hour is running.
         assertEquals(
-            listOf(FooterPart("Apprentice idle", FooterTone.IDLE), FooterPart(" · "), FooterPart("Assistant: Dragon")),
+            listOf(FooterPart("Apprentice ready", FooterTone.IDLE), FooterPart(" · "), FooterPart("Assistant active")),
             m.footerLeft,
         )
         assertEquals("synced 20h ago", m.footerRight)
@@ -106,17 +108,46 @@ class WidgetModelTest {
         assertEquals("BUILDERS 0/6", m.buildersLabel)
         assertEquals(6, m.builderRows.size) // finished jobs stay until the next sync; free builders get no rows
         assertTrue(m.allRows.all { it.kind == RowKind.COMPLETED })
-        assertEquals("Apprentice idle · Assistant idle", m.footerLeft.joinToString("") { it.text })
+        assertEquals(listOf(FooterPart("Helpers: ready", FooterTone.IDLE)), m.footerLeft)
         assertEquals("synced 30d ago", m.footerRight)
         assertNull(m.nextChangeAt?.takeIf { it < t0 + 30L * 86400 })
     }
 
-    @Test fun heroesUseShortNamesInTheFooter() {
+    @Test fun noHelpersInTheExportMeansNoHelperFooter() {
         val text = """{"tag":"#T","timestamp":100,"buildings":[],
-            "heroes":[{"data":28000000,"lvl":98,"timer":5000,"helper_recurrent":true}],
-            "units":[{"data":4000023,"lvl":11,"timer":9000,"helper_recurrent":true}]}"""
+            "heroes":[{"data":28000000,"lvl":98,"timer":5000,"helper_recurrent":true}]}"""
         val s = (SyncLogic.apply(AppState(), text) as SyncLogic.Outcome.Synced).state
-        assertEquals(listOf(FooterPart("Helpers: King · Baby Dragon")), build(100, s).footerLeft)
+        assertEquals(emptyList<FooterPart>(), build(100, s).footerLeft)
+    }
+
+    @Test fun footerSaysWhenEachHelperIsBack() {
+        fun export(cooldown: Long, linkedTimer: Long) =
+            """{"tag":"#T","timestamp":1000,"buildings":[],"helpers":[{"data":93000000,"lvl":8,"helper_cooldown":$cooldown},
+            {"data":93000001,"lvl":12,"helper_cooldown":3000}],
+            "heroes":[{"data":28000000,"lvl":98,"timer":900000,"helper_recurrent":true,"helper_timer":$linkedTimer}]}"""
+        val s = (SyncLogic.apply(AppState(), export(3600, 0)) as SyncLogic.Outcome.Synced).state
+        // Apprentice on King: next session at 4600. Lab Assistant is on no job: available again at 4000.
+        assertEquals(
+            listOf(
+                FooterPart("Apprentice " + FinishClock.format(4600, 1000)), FooterPart(" · "),
+                FooterPart("Assistant " + FinishClock.format(4000, 1000)),
+            ),
+            build(1000, s).footerLeft,
+        )
+        // During the Apprentice's hour (4600..8200) it is active; the Lab Assistant is ready and unused.
+        assertEquals(
+            listOf(FooterPart("Apprentice active"), FooterPart(" · "), FooterPart("Assistant ready", FooterTone.IDLE)),
+            build(5200, s).footerLeft,
+        )
+        // After that hour the next session starts 23 h after the previous one started.
+        assertEquals(
+            FooterPart("Apprentice " + FinishClock.format(4600 + 23 * 3600, 9200)),
+            build(9200, s).footerLeft.first(),
+        )
+        // A session already running when the export was taken (helper_timer) counts as active.
+        val running = (SyncLogic.apply(AppState(), export(80000, 1800)) as SyncLogic.Outcome.Synced).state
+        assertEquals(FooterPart("Apprentice active"), build(1600, running).footerLeft.first())
+        assertEquals(FooterPart("Apprentice " + FinishClock.format(81000, 3000)), build(3000, running).footerLeft.first())
     }
 
     @Test fun noLabOrPetJobShowsIdleRows() {

@@ -85,13 +85,13 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         val builderRows = model.builderRows.take(MAX_BUILDER_ROWS)
         val labRows = model.labRows
         val petRows = listOf(model.petRow)
-        val fit = fit(reportedHeightDp(options), builderRows.size, labRows.size, petRows.size)
+        val fit = fit(reportedHeightDp(options), builderRows.size, labRows.size, petRows.size, dynamicRows = canResizeRows)
         val compact = fit.compact
         val nowMs = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtime()
         fun fill(@IdRes container: Int, rows: List<WidgetRow>) {
             rv.removeAllViews(container)
-            rows.forEach { rv.addView(container, row(it, compact, liveCountdown, nowMs, elapsed)) }
+            rows.forEach { rv.addView(container, row(it, compact, liveCountdown, nowMs, elapsed, fit.rowDp)) }
         }
         // Rows are sorted soonest first, so a short widget keeps the most urgent ones.
         fill(R.id.rows_builders, builderRows.take(fit.builders))
@@ -139,14 +139,14 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         rv.setTextViewText(R.id.builders_label, withFree(model.buildersLabel, model.buildersTotal - model.buildersBusy))
 
         // Same height logic as the big widget, with one row section fewer.
-        val fit = fit(reportedHeightDp(options)?.plus(FIT_SECTION), model.builderRows.size, 1, 0)
+        val fit = fit(reportedHeightDp(options)?.plus(FIT_SECTION), model.builderRows.size, 1, 0, dynamicRows = canResizeRows)
         val nowMs = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtime()
         rv.removeAllViews(R.id.rows_builders)
-        model.builderRows.take(fit.builders).forEach { rv.addView(R.id.rows_builders, row(it, fit.compact, liveCountdown, nowMs, elapsed)) }
+        model.builderRows.take(fit.builders).forEach { rv.addView(R.id.rows_builders, row(it, fit.compact, liveCountdown, nowMs, elapsed, fit.rowDp)) }
         rv.removeAllViews(R.id.rows_lab)
         val labVis = if (fit.lab > 0) View.VISIBLE else View.GONE
-        if (fit.lab > 0) rv.addView(R.id.rows_lab, row(model.labRow, fit.compact, liveCountdown, nowMs, elapsed))
+        if (fit.lab > 0) rv.addView(R.id.rows_lab, row(model.labRow, fit.compact, liveCountdown, nowMs, elapsed, fit.rowDp))
         rv.setViewVisibility(R.id.section_lab, labVis)
         rv.setViewVisibility(R.id.rows_lab, labVis)
         rv.setViewVisibility(R.id.footer, if (fit.footer) View.VISIBLE else View.GONE)
@@ -224,7 +224,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         return v
     }
 
-    private fun row(model: WidgetRow, compact: Boolean, live: Boolean, nowMs: Long, elapsed: Long): RemoteViews {
+    private fun row(model: WidgetRow, compact: Boolean, live: Boolean, nowMs: Long, elapsed: Long, rowDp: Int? = null): RemoteViews {
         // The model already marks a row done Finish.GRACE_SEC early. This also covers a model built a
         // moment before this render, so a chronometer is never started at or past its finish.
         val row = if (model.kind == RowKind.RUNNING && model.finishAt != null && Finish.isDone(model.finishAt, nowMs / 1000)) {
@@ -232,7 +232,11 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         } else {
             model
         }
-        val v =RemoteViews(pkg, if (compact) R.layout.widget_row_compact else R.layout.widget_row)
+        val v = RemoteViews(pkg, if (compact) R.layout.widget_row_compact else R.layout.widget_row)
+        // The launcher's height is rarely a whole number of rows: stretch (or squeeze) the rows to fill the panel.
+        if (rowDp != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            v.setViewLayoutHeight(R.id.row, rowDp.toFloat(), android.util.TypedValue.COMPLEX_UNIT_DIP)
+        }
         val iconPx = ((if (compact) 20 else 24) * density).roundToInt()
 
         val icon = row.iconIds.firstNotNullOfOrNull { icons.bitmap(it.toString(), iconPx) }
@@ -437,6 +441,9 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
 
     companion object {
         const val MAX_BUILDER_ROWS = 8
+
+        /** Row heights can be set per render from Android 12 (`setViewLayoutHeight`). */
+        val canResizeRows: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         private const val CLASH_PACKAGE = "com.supercell.clashofclans"
         private const val GOBLIN_TROOP_ID = "4000002"
 
@@ -461,20 +468,38 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         private const val FIT_ROW = 31
         private const val FIT_ROW_COMPACT = 27
         private const val FIT_FOOTER = 18
+        private const val FIT_SAFETY = 3
+
+        /** Row height range in dp for dynamic rows; from [ROW_NORMAL_MIN] up the larger layout is used. */
+        private const val ROW_MIN = 21
+        private const val ROW_NORMAL_MIN = 27
+        private const val ROW_MAX = 34
 
         /** How many rows of each section are shown, and whether the footer is. */
-        data class Fit(val compact: Boolean, val builders: Int, val lab: Int, val pets: Int, val footer: Boolean)
+        data class Fit(
+            val compact: Boolean, val builders: Int, val lab: Int, val pets: Int, val footer: Boolean,
+            /** Row height in dp when the rows are sized to fill the widget, else the layout's own. */
+            val rowDp: Int? = null,
+        )
 
         /**
          * Everything at 30 dp rows if it fits, else everything at 25 dp, else 25 dp rows cut so
          * nothing is clipped: builders first, then lab, then pets (a section needs room for its
          * line and one row), then the footer. Unknown height = show everything.
          */
-        fun fit(heightDp: Int?, builders: Int, lab: Int, pets: Int): Fit {
+        fun fit(heightDp: Int?, builders: Int, lab: Int, pets: Int, dynamicRows: Boolean = false): Fit {
             val all = Fit(false, builders, lab, pets, true)
             if (heightDp == null) return all
             val fixed = FIT_BASE + 3 * FIT_SECTION + FIT_FOOTER
             val n = builders + lab + pets
+            if (dynamicRows && n > 0) {
+                // Everything shown, rows sized to use the whole height (normal text from 27 dp up, small text below).
+                val avail = heightDp - FIT_SAFETY - fixed
+                val normal = avail / n - 3
+                if (normal >= ROW_NORMAL_MIN) return Fit(false, builders, lab, pets, true, normal.coerceAtMost(ROW_MAX))
+                val small = avail / n - 2
+                if (small >= ROW_MIN) return Fit(true, builders, lab, pets, true, small.coerceAtMost(ROW_NORMAL_MIN))
+            }
             if (fixed + n * FIT_ROW <= heightDp) return all
             if (fixed + n * FIT_ROW_COMPACT <= heightDp) return all.copy(compact = true)
             var budget = heightDp - FIT_BASE - FIT_SECTION

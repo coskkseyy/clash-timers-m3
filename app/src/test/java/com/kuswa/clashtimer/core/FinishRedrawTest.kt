@@ -34,7 +34,7 @@ class FinishRedrawTest {
         assertEquals(1f, row.progress)
         assertEquals(RowButton.NONE, row.button)
         assertEquals("BUILDERS 5/6", m.buildersLabel)
-        assertEquals(FooterPart("Apprentice idle", FooterTone.IDLE), m.footerLeft.first())
+        assertEquals(FooterPart("Apprentice ready", FooterTone.IDLE), m.footerLeft.first())
         // The redraw that posts the notification sees the same job as finished.
         assertTrue(FinishNotices.check(state, settings, names, now).notices.any { it.jobKey == moduleKey })
     }
