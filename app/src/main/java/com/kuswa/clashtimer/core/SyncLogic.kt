@@ -30,9 +30,14 @@ object SyncLogic {
         var boosts = old.boosts.filter { it.end > export.timestamp }
         // `boosts.builder_boost` is the game's own remaining builder-potion time (stacked potions included),
         // so it replaces any builder-potion windows tapped on the widget instead of adding to them.
-        export.builderBoostRemaining?.let { left ->
-            boosts = boosts.filterNot { it.type == BoostType.BUILDER_POTION } +
-                BoostUse(BoostType.BUILDER_POTION, export.timestamp, export.timestamp + left)
+        // Same for research and pet potions read from the export.
+        for ((type, left) in listOf(
+            BoostType.BUILDER_POTION to export.builderBoostRemaining,
+            BoostType.RESEARCH_POTION to export.researchBoostRemaining,
+            BoostType.PET_POTION to export.petBoostRemaining,
+        )) {
+            if (left == null) continue
+            boosts = boosts.filterNot { it.type == type } + BoostUse(type, export.timestamp, export.timestamp + left)
         }
 
         return Outcome.Synced(
@@ -90,5 +95,8 @@ fun SyncLogic.Outcome.describe(names: NameMap): String = when (this) {
         append(" · " + Lang.t("lab", "lab") + ": ").append(e.labJob?.let(names::label) ?: Lang.t("idle", "boşta"))
         append(" · " + Lang.t("pet", "pet") + ": ").append(e.petJob?.let(names::label) ?: Lang.t("idle", "boşta"))
         e.builderBoostRemaining?.let { append(Lang.t(" · builder potion ${WidgetModelBuilder.formatRemaining(it)} left", " · inşaat iksiri ${WidgetModelBuilder.formatRemaining(it)} kaldı")) }
+        e.researchBoostRemaining?.let { append(Lang.t(" · research potion ${WidgetModelBuilder.formatRemaining(it)} left", " · araştırma iksiri ${WidgetModelBuilder.formatRemaining(it)} kaldı")) }
+        e.petBoostRemaining?.let { append(Lang.t(" · pet potion ${WidgetModelBuilder.formatRemaining(it)} left", " · pet iksiri ${WidgetModelBuilder.formatRemaining(it)} kaldı")) }
+        if (e.boostKeys.isNotEmpty()) append(" · boosts: " + e.boostKeys.joinToString(","))
     }
 }

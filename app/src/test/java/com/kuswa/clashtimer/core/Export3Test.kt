@@ -245,7 +245,7 @@ class Export3Test {
     @Test fun describeOutcome() {
         val o = SyncLogic.apply(AppState(), text3)
         assertEquals(
-            "Synced TH18 · 6 builder jobs + Goblin · lab: Baby Dragon → 12 · pet: Angry Jelly → 10 · builder potion 2m left",
+            "Synced TH18 · 6 builder jobs + Goblin · lab: Baby Dragon → 12 · pet: Angry Jelly → 10 · builder potion 2m left · boosts: builder_boost,clocktower_cooldown",
             o.describe(names),
         )
         assertEquals("Sync failed: Clipboard is empty", SyncLogic.apply(AppState(), "").describe(names))

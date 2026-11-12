@@ -59,6 +59,12 @@ data class VillageExport(
     val helperOnFinishedItem: Set<JobCategory> = emptySet(),
     /** `boosts.builder_boost`: seconds left on an active home-village builder potion at T0, or null. */
     val builderBoostRemaining: Long? = null,
+    /** `boosts.lab_boost` (or a variant): seconds left on a running research potion at T0, or null. */
+    val researchBoostRemaining: Long? = null,
+    /** `boosts.pet_boost` (or a variant): seconds left on a running pet potion at T0, or null. */
+    val petBoostRemaining: Long? = null,
+    /** Every key of the export's `boosts` object, shown in the sync message for debugging. */
+    val boostKeys: List<String> = emptyList(),
     /** Builder Base upgrades (`buildings2`, `traps2`, `heroes2` → BUILDER; `units2` → LAB). */
     val bbJobs: List<Job> = emptyList(),
     val builderHallLevel: Int? = null,

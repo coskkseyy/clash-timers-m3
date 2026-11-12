@@ -87,6 +87,13 @@ object ExportParser {
         val builderHall = buildings2.firstOrNull { it.int("data") == GameIds.BUILDER_HALL }?.int("lvl")
         val otto = buildings2.any { it.int("data") == GameIds.OTTOS_OUTPOST }
         val clockTower = (root["boosts"] as? JsonObject)?.long("clocktower_boost")?.takeIf { it > 0 }
+        // Research / pet potions running at export time. Key names aren't documented; these are the
+        // ones seen in other export readers, plus close variants.
+        val boostsObj = root["boosts"] as? JsonObject
+        fun firstBoost(vararg keys: String): Long? = keys.firstNotNullOfOrNull { boostsObj?.long(it)?.takeIf { v -> v > 0 } }
+        val researchBoost = firstBoost("lab_boost", "research_boost", "laboratory_boost")
+        val petBoost = firstBoost("pet_boost", "pet_house_boost", "pethouse_boost")
+        val boostKeys = boostsObj?.keys?.sorted() ?: emptyList()
         // Seconds until the free daily Clock Tower boost can be used again (absent = ready).
         val clockTowerCooldown = (root["boosts"] as? JsonObject)?.long("clocktower_cooldown")?.takeIf { it > 0 }
 
@@ -106,6 +113,9 @@ object ExportParser {
                 jobs = assignOccurrences(jobs),
                 helperOnFinishedItem = helperOnFinished,
                 builderBoostRemaining = builderBoost,
+                researchBoostRemaining = researchBoost,
+                petBoostRemaining = petBoost,
+                boostKeys = boostKeys,
                 bbJobs = assignOccurrences(bbJobs),
                 builderHallLevel = builderHall,
                 hasOttosOutpost = otto,
