@@ -54,7 +54,7 @@ data class WidgetModel(
     val nextChangeAt: Long?,
 ) {
     val buildersLabel: String get() = Lang.t("BUILDERS", "İNŞAAT") + " $buildersBusy/$buildersTotal"
-    val title: String get() = townHall?.let { "$playerName TH$it" } ?: playerName
+    val title: String get() = townHall?.let { playerName + Lang.t(" TH", " BB") + it } ?: playerName
     val labRows: List<WidgetRow> get() = listOf(labRow) + goblinLabRows
     val allRows: List<WidgetRow> get() = builderRows + labRows + petRow
 }

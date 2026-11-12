@@ -161,7 +161,7 @@ private fun SyncScreen(modifier: Modifier = Modifier) {
             },
             enabled = !busy,
             modifier = Modifier.fillMaxWidth(),
-        ) { Text(if (busy) Lang.t("Syncing…", "Sync yapılıyor…") else Lang.t("Sync from clipboard", "Panodan sync yap")) }
+        ) { Text(if (busy) Lang.t("Syncing…", "Eşitleniyor…") else Lang.t("Sync from clipboard", "Panodan eşitle")) }
 
         // Last result, in plain text.
         val last = log.lastResult

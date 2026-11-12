@@ -89,7 +89,7 @@ fun SyncLogic.Outcome.describe(names: NameMap): String = when (this) {
     is SyncLogic.Outcome.Synced -> buildString {
         val e = export
         append(Lang.t("Synced", "Sync tamam"))
-        e.townHallLevel?.let { append(" TH$it") }
+        e.townHallLevel?.let { append(Lang.t(" TH", " BB") + it) }
         val goblin = e.builderJobs.count { it.isGoblin }
         append(" · ${e.regularBuilderJobs.size} " + Lang.t("builder job", "inşaat"))
         if (e.regularBuilderJobs.size != 1 && !Lang.tr) append("s")

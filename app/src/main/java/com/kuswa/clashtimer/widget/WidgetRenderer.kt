@@ -50,7 +50,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         rv.setOnClickPendingIntent(R.id.header, sync)
         rv.setOnClickPendingIntent(R.id.sync_button, sync)
         rv.setTextViewText(R.id.who, title(model))
-        rv.setTextViewText(R.id.sync_text, "Sync")
+        rv.setTextViewText(R.id.sync_text, Lang.t("Sync", "Eşitle"))
         rv.setTextViewText(R.id.label_pets, Lang.t("PETS", "EVCİL HAYVANLAR"))
         rv.setTextViewText(R.id.empty_hint, Lang.t("Clash: Settings, Data Export, Copy", "Clash: Ayarlar, Veri Dışa Aktarma, Kopyala"))
 
@@ -119,12 +119,12 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         val title = SpannableStringBuilder(model.playerName)
         model.builderHall?.let { bh ->
             val start = title.length
-            title.append(" BH$bh")
+            title.append(Lang.t(" BH", " İB") + bh)
             title.setSpan(AbsoluteSizeSpan(12, true), start, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             title.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         rv.setTextViewText(R.id.who, title)
-        rv.setTextViewText(R.id.sync_text, "Sync")
+        rv.setTextViewText(R.id.sync_text, Lang.t("Sync", "Eşitle"))
         rv.setTextViewText(R.id.section_lab, Lang.t("STAR LAB", "YILDIZ LAB"))
         if (!model.hasData) {
             rv.setViewVisibility(R.id.content, View.GONE)
@@ -347,7 +347,7 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
         val sb = SpannableStringBuilder(model.playerName)
         model.townHall?.let { th ->
             val start = sb.length
-            sb.append(" TH$th")
+            sb.append(Lang.t(" TH", " BB") + th)
             sb.setSpan(AbsoluteSizeSpan(12, true), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sb.setSpan(ForegroundColorSpan(color(R.color.m_primary)), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
