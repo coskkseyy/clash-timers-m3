@@ -127,7 +127,7 @@ object FinishNotices {
         val heading = when {
             job.category == JobCategory.LAB && job.isGoblin -> Lang.t("Goblin Researcher done: $title", "Goblin Araştırmacı bitirdi: $title")
             job.category == JobCategory.LAB -> Lang.t("Lab free", "Laboratuvar boşta")
-            job.category == JobCategory.PET -> Lang.t("Pet house free", "Evcil hayvan evi boşta")
+            job.category == JobCategory.PET -> Lang.t("Pet house free", "Hayvan Barınağı boşta")
             job.isGoblin -> Lang.t("Goblin Builder done: $title", "Goblin İnşaatçı bitirdi: $title")
             else -> Lang.t("Builder free: $title", "İnşaatçı boşta: $title")
         }

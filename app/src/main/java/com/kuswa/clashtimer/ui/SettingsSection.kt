@@ -88,7 +88,7 @@ fun SettingsSection(
         HoursStepper(Lang.t("Research potion", "Araştırma iksiri"), b.researchPotionSavingSec, 1..47) { v -> boosts { it.copy(researchPotionSavingSec = v) } }
         HoursStepper(Lang.t("Pet potion", "Evcil hayvan iksiri"), b.petPotionSavingSec, 1..47) { v -> boosts { it.copy(petPotionSavingSec = v) } }
         HoursStepper("Study Soup", b.studySoupSavingSec, 1..23) { v -> boosts { it.copy(studySoupSavingSec = v) } }
-        SwitchRow(Lang.t("Study Soup also speeds up the Pet House", "Study Soup evcil hayvan evini de hızlandırır"), b.soupAppliesToPets) { on ->
+        SwitchRow(Lang.t("Study Soup also speeds up the Pet House", "Study Soup Hayvan Barınağı'nı da hızlandırır"), b.soupAppliesToPets) { on ->
             boosts { it.copy(soupAppliesToPets = on) }
         }
 
@@ -156,7 +156,7 @@ fun SettingsSection(
         )
 
         Text(Lang.t("Notifications", "Bildirimler"), style = MaterialTheme.typography.labelLarge)
-        SwitchRow(Lang.t("Notify when a builder, the lab or the pet house is free", "İnşaatçı, laboratuvar ya da evcil hayvan evi boşalınca bildir"), settings.notificationsEnabled) { on ->
+        SwitchRow(Lang.t("Notify when a builder, the lab or the pet house is free", "İnşaatçı, laboratuvar ya da Hayvan Barınağı boşalınca bildir"), settings.notificationsEnabled) { on ->
             onChange { it.copy(notificationsEnabled = on) }
             if (on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !Notifier.allowed(context)) {
                 askPermission.launch(Manifest.permission.POST_NOTIFICATIONS)

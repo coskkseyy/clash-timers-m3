@@ -73,6 +73,10 @@ object Names {
     fun get(context: Context): NameMap = cached ?: synchronized(this) {
         cached ?: context.applicationContext.assets.open("names.json").bufferedReader().use {
             NameMap.fromJson(it.readText())
+        }.let { en ->
+            runCatching {
+                context.applicationContext.assets.open("names_tr.json").bufferedReader().use { en.withTurkish(it.readText()) }
+            }.getOrDefault(en)
         }.also { cached = it }
     }
 }

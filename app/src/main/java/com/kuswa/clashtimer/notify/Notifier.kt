@@ -25,7 +25,7 @@ object Notifier {
         if (nm.getNotificationChannel(CHANNEL_ID) != null) return
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL_ID, com.kuswa.clashtimer.core.Lang.t("Upgrade finished", "Yükseltme bitti"), NotificationManager.IMPORTANCE_HIGH).apply {
-                description = com.kuswa.clashtimer.core.Lang.t("A builder, the lab or the pet house became free", "Bir inşaatçı, laboratuvar ya da evcil hayvan evi boşaldı")
+                description = com.kuswa.clashtimer.core.Lang.t("A builder, the lab or the pet house became free", "Bir inşaatçı, laboratuvar ya da Hayvan Barınağı boşaldı")
             },
         )
     }

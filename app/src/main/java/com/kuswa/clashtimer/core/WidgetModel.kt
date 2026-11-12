@@ -152,7 +152,7 @@ object WidgetModelBuilder {
                 researchPotion = pills(BoostType.RESEARCH_POTION), petPotion = pills(BoostType.PET_POTION),
                 soup = pills(BoostType.STUDY_SOUP), goblinResearching = false,
                 builderRows = emptyList(),
-                labRow = idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY), petRow = idleRow(Lang.t("Pet House", "Evcil Hayvan Evi"), PET_HOUSE),
+                labRow = idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY), petRow = idleRow(Lang.t("Pet House", "Hayvan Barınağı"), PET_HOUSE),
                 footerLeft = if (state.syncFailed) listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR)) else emptyList(),
                 footerRight = "", syncFailed = state.syncFailed, nextChangeAt = null,
             )
@@ -201,7 +201,7 @@ object WidgetModelBuilder {
         val labRow = sorted(export.labJobs.filter { !it.isGoblin }).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Laboratory", "Laboratuvar"), LABORATORY)
         // Like the Goblin Builder: the Goblin Researcher's row disappears once it is done.
         val goblinLabRows = sorted(export.labJobs.filter { it.isGoblin && running(it) }).map(::row)
-        val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Pet House", "Evcil Hayvan Evi"), PET_HOUSE)
+        val petRow = sorted(export.petJobs).firstOrNull()?.let(::row) ?: idleRow(Lang.t("Pet House", "Hayvan Barınağı"), PET_HOUSE)
 
         val footerLeft = if (state.syncFailed) {
             listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR))
