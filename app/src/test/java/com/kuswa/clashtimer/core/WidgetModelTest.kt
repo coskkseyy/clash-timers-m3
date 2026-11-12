@@ -53,7 +53,7 @@ class WidgetModelTest {
         assertEquals("Spirit Fox → 8" to "2d 17h", m.petRow.let { it.label to it.staticStatus })
 
         // Both helpers are on a job and start their next session at T0 + 72189 (the export's cooldown).
-        assertEquals(listOf(FooterPart("Helpers: " + FinishClock.format(t0 + 72189, t0 + 3600))), m.footerLeft)
+        assertEquals(listOf(FooterPart("Helpers: reset in " + formatRemaining(72189 - 3600))), m.footerLeft)
         assertEquals("synced 1h ago", m.footerRight)
         assertFalse(m.syncFailed)
     }
@@ -129,8 +129,8 @@ class WidgetModelTest {
         // Apprentice on King: next session at 4600. Lab Assistant is on no job: available again at 4000.
         assertEquals(
             listOf(
-                FooterPart("Apprentice " + FinishClock.format(4600, 1000)), FooterPart(" · "),
-                FooterPart("Assistant " + FinishClock.format(4000, 1000)),
+                FooterPart("Apprentice reset in " + formatRemaining(3600)), FooterPart(" · "),
+                FooterPart("Assistant reset in " + formatRemaining(3000)),
             ),
             build(1000, s).footerLeft,
         )
@@ -141,13 +141,13 @@ class WidgetModelTest {
         )
         // After that hour the next session starts 23 h after the previous one started.
         assertEquals(
-            FooterPart("Apprentice " + FinishClock.format(4600 + 23 * 3600, 9200)),
+            FooterPart("Apprentice reset in " + formatRemaining(4600 + 23 * 3600 - 9200)),
             build(9200, s).footerLeft.first(),
         )
         // A session already running when the export was taken (helper_timer) counts as active.
         val running = (SyncLogic.apply(AppState(), export(80000, 1800)) as SyncLogic.Outcome.Synced).state
         assertEquals(FooterPart("Apprentice active"), build(1600, running).footerLeft.first())
-        assertEquals(FooterPart("Apprentice " + FinishClock.format(81000, 3000)), build(3000, running).footerLeft.first())
+        assertEquals(FooterPart("Apprentice reset in " + formatRemaining(81000 - 3000)), build(3000, running).footerLeft.first())
     }
 
     @Test fun noLabOrPetJobShowsIdleRows() {

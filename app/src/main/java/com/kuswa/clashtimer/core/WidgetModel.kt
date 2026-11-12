@@ -1,6 +1,5 @@
 package com.kuswa.clashtimer.core
 
-import java.time.ZoneId
 import kotlin.math.ceil
 
 /**
@@ -140,7 +139,6 @@ object WidgetModelBuilder {
         names: NameMap,
         times: UpgradeTimes,
         now: Long,
-        zone: ZoneId = ZoneId.systemDefault(),
     ): WidgetModel {
         val export = state.export
         val pills = { type: BoostType ->
@@ -211,8 +209,8 @@ object WidgetModelBuilder {
             listOf(FooterPart(SYNC_FAILED, FooterTone.ERROR))
         } else {
             helperStatus(
-                apprentice = helperState(export.helper(GameIds.HELPER_BUILDERS_APPRENTICE), apprenticeJob, export, settings.boosts, now, zone),
-                assistant = helperState(export.helper(GameIds.HELPER_LAB_ASSISTANT), assistantJob, export, settings.boosts, now, zone),
+                apprentice = helperState(export.helper(GameIds.HELPER_BUILDERS_APPRENTICE), apprenticeJob, export, settings.boosts, now),
+                assistant = helperState(export.helper(GameIds.HELPER_LAB_ASSISTANT), assistantJob, export, settings.boosts, now),
             )
         }
 
@@ -265,7 +263,7 @@ object WidgetModelBuilder {
     private fun runningJob(key: String?, export: VillageExport, running: (Job) -> Boolean): Job? =
         key?.let { k -> export.jobs.firstOrNull { it.key == k } }?.takeIf(running)
 
-    /** What the footer says about one helper: `ready`, `active`, or the clock time it is available again. */
+    /** What the footer says about one helper: `ready`, `active`, or `reset in 15h 32m`. */
     data class HelperState(val text: String, val idle: Boolean)
 
     /**
@@ -274,12 +272,12 @@ object WidgetModelBuilder {
      * every `helperPeriodSec` from the end of the cooldown, so it says `active` during a session and
      * otherwise when the next one starts.
      */
-    fun helperState(helper: Helper?, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long, zone: ZoneId): HelperState? {
+    fun helperState(helper: Helper?, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long): HelperState? {
         helper ?: return null
         val first = export.timestamp + helper.cooldown
         if (linked == null) {
             return if (first <= now) HelperState(Lang.t("ready", "hazır"), idle = true)
-            else HelperState(FinishClock.format(first, now, zone), idle = false)
+            else HelperState(resetIn(first - now), idle = false)
         }
         val window = boosts.helperWindowSec
         val period = boosts.helperPeriodSec.coerceAtLeast(window)
@@ -287,13 +285,30 @@ object WidgetModelBuilder {
             (first <= now && (now - first) % period < window)
         if (running) return HelperState(Lang.t("active", "aktif"), idle = false)
         val next = if (first > now) first else first + ((now - first) / period + 1) * period
-        return HelperState(FinishClock.format(next, now, zone), idle = false)
+        return HelperState(resetIn(next - now), idle = false)
+    }
+
+    private fun resetIn(seconds: Long): String =
+        formatRemaining(seconds).let { Lang.t("reset in $it", "$it sonra") }
+
+    /** When the text of [helperState] counts down to, or null if it says `ready` / `active`. */
+    private fun helperTarget(helper: Helper, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long): Long? {
+        val first = export.timestamp + helper.cooldown
+        if (linked == null) return first.takeIf { it > now }
+        val window = boosts.helperWindowSec
+        val period = boosts.helperPeriodSec.coerceAtLeast(window)
+        val running = (linked.helperTimer > 0 && now < export.timestamp + linked.helperTimer) ||
+            (first <= now && (now - first) % period < window)
+        if (running) return null
+        return if (first > now) first else first + ((now - first) / period + 1) * period
     }
 
     /** Times after which [helperState] changes: cooldown over, a session starting or ending. */
     private fun helperEdges(helper: Helper, linked: Job?, export: VillageExport, boosts: BoostSettings, now: Long): List<Long> = buildList {
         val first = export.timestamp + helper.cooldown
         if (first > now) add(first)
+        // The countdown text itself changes every minute (hours once it is a day or more away).
+        WidgetSchedule.staticTextEdge(helperTarget(helper, linked, export, boosts, now) ?: return@buildList, now)?.let(::add)
         if (linked == null) return@buildList
         val window = boosts.helperWindowSec
         val period = boosts.helperPeriodSec.coerceAtLeast(window)
@@ -308,7 +323,7 @@ object WidgetModelBuilder {
     }
 
     /**
-     * `Helpers: 03:20` when both are the same, else `Apprentice 03:20 · Assistant ready`
+     * `Helpers: reset in 15h 32m` when both are the same, else `Apprentice reset in 2h · Assistant ready`
      * (a helper that is ready but unused is drawn in orange). Empty if the export has no helpers.
      */
     fun helperStatus(apprentice: HelperState?, assistant: HelperState?): List<FooterPart> {

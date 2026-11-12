@@ -193,8 +193,8 @@ class Export3Test {
         assertEquals(1 - 41921 / 1166400f, m.builderRows[0].progress, 1e-4f)
         assertEquals(listOf(28000000), m.builderRows[2].iconIds)
         assertEquals(listOf("IT", "WT", "BK", "S", "S", "RC", "L"), m.builderRows.map { it.initials })
-        // No helper is on a job and both cooldowns (1331 s) are the same: one part, the clock time they are back.
-        assertEquals(listOf(FooterPart("Helpers: " + FinishClock.format(t0 + 1331, t0))), m.footerLeft)
+        // No helper is on a job and both cooldowns (1331 s) are the same: one part, the time left.
+        assertEquals(listOf(FooterPart("Helpers: reset in " + WidgetModelBuilder.formatRemaining(1331))), m.footerLeft)
         assertEquals("synced just now", m.footerRight)
     }
 
