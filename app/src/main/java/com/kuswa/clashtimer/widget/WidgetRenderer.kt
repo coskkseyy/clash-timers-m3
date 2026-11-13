@@ -301,7 +301,9 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
             RowButton.NONE -> v.setViewVisibility(R.id.row_btn, View.INVISIBLE)
             RowButton.LINK -> Unit // green + is the layout default
             RowButton.APPRENTICE, RowButton.LAB_ASSISTANT -> {
-                v.setInt(R.id.row_btn, "setBackgroundResource", R.drawable.btn_helper)
+                // Near the end of the bar the badge sits on the progress fill: use the Goblin badge's dark background so it stays visible.
+                val onFill = row.progress >= BADGE_ON_FILL
+                v.setInt(R.id.row_btn, "setBackgroundResource", if (onFill) R.drawable.badge_goblin else R.drawable.btn_helper)
                 val name = if (row.button == RowButton.APPRENTICE) "apprentice" else "lab_assistant"
                 val badge = icons.bitmap(name, ((if (compact) 19 else 22) * density).roundToInt())
                 if (badge != null) {
@@ -441,6 +443,9 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
 
     companion object {
         const val MAX_BUILDER_ROWS = 8
+
+        /** Progress from which the right-hand helper badge lies over the filled part of the bar. */
+        private const val BADGE_ON_FILL = 0.9f
 
         /** Row heights can be set per render from Android 12 (`setViewLayoutHeight`). */
         val canResizeRows: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
