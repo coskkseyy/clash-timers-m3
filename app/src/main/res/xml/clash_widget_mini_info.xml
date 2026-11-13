@@ -10,6 +10,8 @@
     android:minResizeHeight="90dp"
     android:targetCellWidth="2"
     android:targetCellHeight="2"
+    android:configure="com.kuswa.clashtimer.widget.WidgetConfigActivity"
+    android:widgetFeatures="reconfigurable"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen" />

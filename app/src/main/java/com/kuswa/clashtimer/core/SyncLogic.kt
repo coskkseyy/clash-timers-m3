@@ -48,6 +48,7 @@ object SyncLogic {
                 links = links,
                 boosts = boosts,
                 syncFailed = false,
+                name = old.name,
                 firstRemaining = export.jobs.associate { job ->
                     // max(): a key can be reused by a different instance (e.g. the second of two
                     // identical upgrades after the first finished); never shrink the bar's length.

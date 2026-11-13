@@ -2,6 +2,9 @@ package com.kuswa.clashtimer.sync
 
 import android.content.ClipboardManager
 import android.content.Context
+import com.kuswa.clashtimer.core.AppState
+import com.kuswa.clashtimer.core.ExportParser
+import com.kuswa.clashtimer.core.ParseResult
 import com.kuswa.clashtimer.core.SyncLogic
 import com.kuswa.clashtimer.core.describe
 import com.kuswa.clashtimer.data.Names
@@ -31,13 +34,13 @@ object SyncRunner {
      * Runs to completion even if the caller's scope is cancelled (the activity may finish).
      * Never throws: errors are logged and returned as a failed [Result].
      */
-    suspend fun sync(context: Context, clipboard: String?, source: String): Result = withContext(NonCancellable) {
+    suspend fun sync(context: Context, clipboard: String?, source: String, account: String = ""): Result = withContext(NonCancellable) {
         val app = context.applicationContext
-        val repo = StateRepository(app)
+        val repo = StateRepository(app, account)
         runCatching { com.kuswa.clashtimer.core.Lang.apply(repo.currentSettings()) }
         val result = try {
             val outcome = repo.updateState { old ->
-                val o = SyncLogic.apply(old, clipboard)
+                val o = otherVillage(old, clipboard) ?: SyncLogic.apply(old, clipboard)
                 o.state to o
             }
             Result(outcome is SyncLogic.Outcome.Synced, plainText(outcome.describe(Names.get(app))))
@@ -47,6 +50,20 @@ object SyncRunner {
         repo.log(source, result.ok, result.message)
         refreshWidgets(app, source)
         result
+    }
+
+    /** A widget's account stays on its own village: an export of another player tag is refused, not mixed in. */
+    private fun otherVillage(old: AppState, clipboard: String?): SyncLogic.Outcome? {
+        val oldTag = old.export?.tag ?: return null
+        val newTag = (ExportParser.parse(clipboard ?: return null) as? ParseResult.Success)?.export?.tag ?: return null
+        if (newTag == oldTag) return null
+        return SyncLogic.Outcome.Failed(
+            old.copy(syncFailed = true),
+            com.kuswa.clashtimer.core.Lang.t(
+                "this widget is for $oldTag, the copied village is $newTag",
+                "bu widget $oldTag için, panodaki köy $newTag",
+            ),
+        )
     }
 
     /** Re-renders every placed widget; logs failures and how many widgets are placed. */

@@ -22,6 +22,8 @@ data class AppState(
     val firstRemaining: Map<String, Long> = emptyMap(),
     /** Keys of finished jobs that already got a "… free" notification (reset by every sync). */
     val notified: Set<String> = emptySet(),
+    /** Name of this account on its widgets; null = the name from the settings (the first account). */
+    val name: String? = null,
 ) {
     /** The parsed export, or null if nothing has been synced yet. */
     val export: VillageExport? by lazy {
@@ -76,6 +78,13 @@ data class AppSettings(
         }
         return fullSec * (100 - pct.coerceIn(0, 90)) / 100
     }
+
+    /**
+     * The settings as they apply to [account]: the first account ("") uses [playerName], the others
+     * the name stored with them.
+     */
+    fun forAccount(account: String, state: AppState): AppSettings =
+        if (account.isEmpty()) this else state.name?.let { copy(playerName = it) } ?: this
 
     /** The name the widget shows: [playerName], or [DEFAULT_PLAYER_NAME] if it is missing or blank. */
     val displayName: String get() = playerName?.trim()?.takeIf { it.isNotEmpty() } ?: DEFAULT_PLAYER_NAME

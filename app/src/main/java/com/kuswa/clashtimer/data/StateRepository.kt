@@ -23,10 +23,13 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  * All persisted state lives in one Preferences DataStore: [AppState] and [AppSettings],
  * each stored as a JSON string under its own key.
  */
-class StateRepository(context: Context) {
+class StateRepository(context: Context, account: String = "") {
     private val store = context.applicationContext.dataStore
 
-    val state: Flow<AppState> = store.data.map { AppState.decode(it[STATE]) }.distinctUntilChanged()
+    /** Each account has its own state; "" is the first one (and every widget placed before accounts existed). */
+    private val stateKey = if (account.isEmpty()) STATE else stringPreferencesKey("state_json_$account")
+
+    val state: Flow<AppState> = store.data.map { AppState.decode(it[stateKey]) }.distinctUntilChanged()
     val settings: Flow<AppSettings> = store.data.map { AppSettings.decode(it[SETTINGS]) }.distinctUntilChanged()
     val syncLog: Flow<SyncLog> = store.data.map { SyncLog.decode(it[SYNC_LOG]) }.distinctUntilChanged()
 
@@ -37,8 +40,8 @@ class StateRepository(context: Context) {
     suspend fun <R> updateState(transform: (AppState) -> Pair<AppState, R>): R {
         var result: R? = null
         store.edit { prefs ->
-            val (next, r) = transform(AppState.decode(prefs[STATE]))
-            prefs[STATE] = next.encode()
+            val (next, r) = transform(AppState.decode(prefs[stateKey]))
+            prefs[stateKey] = next.encode()
             result = r
         }
         @Suppress("UNCHECKED_CAST")
@@ -55,6 +58,27 @@ class StateRepository(context: Context) {
         }
     }
 
+    /** Which account a widget shows; widgets that were never configured show the first one (""). */
+    suspend fun accountFor(widgetId: Int): String = bindingsOf(store.data.first())[widgetId] ?: ""
+
+    suspend fun bind(widgetId: Int, account: String) {
+        store.edit { prefs ->
+            val all = bindingsOf(prefs) + (widgetId to account)
+            prefs[BINDINGS] = all.entries.joinToString(";") { "${it.key}=${it.value}" }
+        }
+    }
+
+    /** "" plus every account a widget has been bound to. */
+    suspend fun knownAccounts(): List<String> = (listOf("") + bindingsOf(store.data.first()).values).distinct()
+
+    suspend fun newAccountId(): String = ((knownAccounts().mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 1) + 1).toString()
+
+    private fun bindingsOf(prefs: Preferences): Map<Int, String> =
+        prefs[BINDINGS].orEmpty().split(';').mapNotNull { entry ->
+            val i = entry.indexOf('=')
+            if (i <= 0) null else entry.substring(0, i).toIntOrNull()?.let { it to entry.substring(i + 1) }
+        }.toMap()
+
     suspend fun updateSettings(transform: (AppSettings) -> AppSettings) {
         store.edit { prefs -> prefs[SETTINGS] = transform(AppSettings.decode(prefs[SETTINGS])).encode() }
     }
@@ -63,6 +87,7 @@ class StateRepository(context: Context) {
         val STATE = stringPreferencesKey("state_json")
         val SETTINGS = stringPreferencesKey("settings_json")
         val SYNC_LOG = stringPreferencesKey("sync_log_json")
+        val BINDINGS = stringPreferencesKey("widget_accounts")
     }
 }
 

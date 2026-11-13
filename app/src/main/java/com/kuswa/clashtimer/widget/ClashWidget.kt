@@ -60,9 +60,11 @@ open class ClashWidgetReceiver : AppWidgetProvider() {
         val segments = intent.data?.pathSegments.orEmpty()
         val action = segments.getOrNull(0) ?: return
         val arg = segments.getOrNull(1) ?: return
+        val widgetId = intent.data?.getQueryParameter("w")?.toIntOrNull()
         runAsync {
             val app = context.applicationContext
-            val repo = StateRepository(app)
+            val account = widgetId?.let { StateRepository(app).accountFor(it) } ?: ""
+            val repo = StateRepository(app, account)
             try {
                 val settings = repo.currentSettings()
                 val now = System.currentTimeMillis() / 1000
@@ -131,14 +133,30 @@ object WidgetUpdater {
             val nowMs = System.currentTimeMillis()
             val now = nowMs / 1000
 
+            val manager = AppWidgetManager.getInstance(app)
+            val ids = widgetIds(app)
+            val miniIds = miniWidgetIds(app)
+            val bbIds = bbWidgetIds(app)
+            // Every placed widget shows one account (older widgets: the first one). Several widgets
+            // can show the same account; accounts never touch each other's data.
+            val accountOf = (ids + miniIds + bbIds).associateWith { repo.accountFor(it) }
+            val accounts = accountOf.values.toSet().ifEmpty { setOf("") }
+            val multi = accounts.size > 1
+
             // Notifications first, marked as sent in the same atomic update so two alarms can't double-post.
             // Own try: a notification failure must never skip the redraw below, which turns the
             // finished rows into "Completed ✓" in the same pass that announced them.
             try {
-                val notices = repo.updateState { state ->
-                    val r = FinishNotices.check(state, settings, names, now)
-                    val fresh = r.notices.filter { it.jobKey !in state.notified }
-                    state.copy(notified = r.notified) to fresh
+                val notices = accounts.flatMap { a ->
+                    StateRepository(app, a).updateState { state ->
+                        val accountSettings = settings.forAccount(a, state)
+                        val r = FinishNotices.check(state, accountSettings, names, now)
+                        val fresh = r.notices.filter { it.jobKey !in state.notified }.map { n ->
+                            // Two accounts can have the same job key: keep the notifications apart and say whose they are.
+                            if (multi) n.copy(jobKey = "$a/${n.jobKey}", text = "${accountSettings.displayName}: ${n.text}") else n
+                        }
+                        state.copy(notified = r.notified) to fresh
+                    }
                 }
                 if (notices.isNotEmpty()) {
                     if (settings.notificationsEnabled) {
@@ -153,37 +171,47 @@ object WidgetUpdater {
                 repo.log(source, false, "Notification failed: ${t.javaClass.simpleName}: ${t.message}")
             }
 
-            val state = repo.currentState()
+            val states = accounts.associateWith { StateRepository(app, it).currentState() }
             // Finish + GRACE_SEC, so the redraw it triggers sees the job as done.
-            WidgetAlarm.scheduleFinish(app, FinishNotices.alarmAt(state, settings, now)?.times(1000))
+            WidgetAlarm.scheduleFinish(
+                app,
+                states.values.mapNotNull { FinishNotices.alarmAt(it, settings, now) }.minOrNull()?.times(1000),
+            )
 
-            val manager = AppWidgetManager.getInstance(app)
-            val ids = widgetIds(app)
-            val miniIds = miniWidgetIds(app)
-            val bbIds = bbWidgetIds(app)
             if (ids.isEmpty() && miniIds.isEmpty() && bbIds.isEmpty()) {
                 WidgetAlarm.cancelRedraw(app)
                 return 0
             }
-            val model = WidgetModelBuilder.build(state, settings, names, Times.get(app), now)
-            val renderer = WidgetRenderer(app, settings.showFinishTime)
+            val times = Times.get(app)
+            val models = states.mapValues { (a, state) ->
+                WidgetModelBuilder.build(state, settings.forAccount(a, state), names, times, now)
+            }
             for (id in ids) {
-                manager.updateAppWidget(id, renderer.render(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
+                val renderer = WidgetRenderer(app, settings.showFinishTime, id)
+                manager.updateAppWidget(id, renderer.render(models.getValue(accountOf.getValue(id)), settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
             for (id in miniIds) {
-                manager.updateAppWidget(id, renderer.renderMini(model, settings.liveCountdown, manager.getAppWidgetOptions(id)))
+                val renderer = WidgetRenderer(app, settings.showFinishTime, id)
+                manager.updateAppWidget(id, renderer.renderMini(models.getValue(accountOf.getValue(id)), settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
-            val bbModel = if (bbIds.isNotEmpty()) BuilderBase.build(state, settings, names, Times.get(app), now) else null
+            val bbModels = if (bbIds.isEmpty()) emptyMap() else states.mapValues { (a, state) ->
+                BuilderBase.build(state, settings.forAccount(a, state), names, times, now)
+            }
             for (id in bbIds) {
-                manager.updateAppWidget(id, renderer.renderBb(bbModel!!, settings.liveCountdown, manager.getAppWidgetOptions(id)))
+                val renderer = WidgetRenderer(app, settings.showFinishTime, id)
+                manager.updateAppWidget(id, renderer.renderBb(bbModels.getValue(accountOf.getValue(id)), settings.liveCountdown, manager.getAppWidgetOptions(id)))
             }
             WidgetAlarm.scheduleRedraw(
                 app,
-                listOfNotNull(
-                    WidgetSchedule.nextUpdateMs(model, nowMs, settings.liveCountdown),
-                    bbModel?.let { WidgetSchedule.nextRowsUpdateMs(it.allRows, nowMs, settings.liveCountdown) },
-                    bbModel?.nextChangeAt?.times(1000)?.takeIf { it > nowMs },
-                ).minOrNull(),
+                (
+                    models.values.mapNotNull { WidgetSchedule.nextUpdateMs(it, nowMs, settings.liveCountdown) } +
+                        bbModels.values.flatMap { bb ->
+                            listOfNotNull(
+                                WidgetSchedule.nextRowsUpdateMs(bb.allRows, nowMs, settings.liveCountdown),
+                                bb.nextChangeAt?.times(1000)?.takeIf { it > nowMs },
+                            )
+                        }
+                    ).minOrNull(),
             )
             ids.size + miniIds.size + bbIds.size
         } catch (t: Throwable) {

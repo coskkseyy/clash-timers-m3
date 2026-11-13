@@ -63,6 +63,17 @@
             android:taskAffinity=""
             android:theme="@style/Theme.ClashTimer.Invisible" />
 
+        <!-- Shown when a widget is placed (and from its long-press menu): which account it shows, and its name. -->
+        <activity
+            android:name=".widget.WidgetConfigActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.ClashTimer">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".widget.ClashWidgetReceiver"
             android:exported="true"

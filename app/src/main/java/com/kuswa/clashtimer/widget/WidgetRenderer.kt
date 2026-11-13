@@ -38,7 +38,7 @@ import com.kuswa.clashtimer.sync.SyncActivity
 import kotlin.math.roundToInt
 
 /** Maps a [WidgetModel] onto `widget_root.xml` + one `widget_row*.xml` per row. */
-class WidgetRenderer(private val context: Context, private val finishTime: Boolean = false) {
+class WidgetRenderer(private val context: Context, private val finishTime: Boolean = false, private val widgetId: Int = 0) {
 
     private val pkg = context.packageName
     private val icons = WidgetIcons.get(context)
@@ -341,7 +341,8 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
      * The URI makes every action + argument a distinct PendingIntent.
      */
     private fun tapIntent(action: String, arg: String): PendingIntent {
-        val uri = Uri.Builder().scheme("clashtimer").authority("tap").appendPath(action).appendPath(arg).build()
+        val uri = Uri.Builder().scheme("clashtimer").authority("tap").appendPath(action).appendPath(arg)
+            .appendQueryParameter("w", widgetId.toString()).build()
         val intent = Intent(context, ClashWidgetReceiver::class.java)
             .setAction(ClashWidgetReceiver.ACTION_TAP)
             .setData(uri)
@@ -433,11 +434,13 @@ class WidgetRenderer(private val context: Context, private val finishTime: Boole
     }
 
     private fun syncIntent(): PendingIntent {
-        val intent = Intent(context, SyncActivity::class.java).addFlags(
-            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TASK,
-        )
+        // One intent per widget: the Sync button of a widget syncs that widget's account.
+        val intent = Intent(context, SyncActivity::class.java)
+            .setData(Uri.parse("clashtimer://sync/$widgetId"))
+            .putExtra(SyncActivity.EXTRA_WIDGET_ID, widgetId)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         return PendingIntent.getActivity(
-            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 

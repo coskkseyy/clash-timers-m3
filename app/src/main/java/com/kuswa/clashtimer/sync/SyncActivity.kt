@@ -58,7 +58,8 @@ class SyncActivity : ComponentActivity() {
         if (viaFallback) log(null, "No window focus after ${FOCUS_FALLBACK_MS} ms; read clipboard anyway")
 
         lifecycleScope.launch {
-            val result = SyncRunner.sync(this@SyncActivity, text, SOURCE)
+            val account = StateRepository(applicationContext).accountFor(intent.getIntExtra(EXTRA_WIDGET_ID, 0))
+            val result = SyncRunner.sync(this@SyncActivity, text, SOURCE, account)
             // Shown while this activity is still in front, so ROMs that block background toasts allow it.
             Toast.makeText(this@SyncActivity, result.message, Toast.LENGTH_LONG).show()
             finishQuietly()
@@ -85,9 +86,10 @@ class SyncActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    private companion object {
-        const val SOURCE = "widget"
-        const val FOCUS_FALLBACK_MS = 1500L
-        const val HARD_TIMEOUT_MS = 8000L
+    companion object {
+        const val EXTRA_WIDGET_ID = "widget_id"
+        private const val SOURCE = "widget"
+        private const val FOCUS_FALLBACK_MS = 1500L
+        private const val HARD_TIMEOUT_MS = 8000L
     }
 }
