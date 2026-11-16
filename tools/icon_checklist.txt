@@ -44,6 +44,10 @@ Defenses (builder)
 1000067.webp          Scattershot
 1000072.webp          Spell Tower
 1000102.webp          Super Wizard Tower
+1000107.webp          Spiky Tower
+1000108.webp          Firecracker Tower
+1000106.webp          Squad Barracks
+1000105.webp          Guardian Building
 1000011.webp          Wizard Tower
 1000021.webp          X-Bow
 
