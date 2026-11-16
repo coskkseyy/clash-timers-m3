@@ -1,5 +1,5 @@
 {
- "source": "clash-of-clans-data@0.19.1 (data/home) + data/builder",
+ "source": "clash-of-clans-data@0.19.1 + game logic CSVs (Town Hall 19)",
  "names": {
   "1000000": "Army Camp",
   "1000001": "Town Hall",
@@ -75,6 +75,10 @@
   "1000093": "Helper Hut",
   "1000097": "Crafting Station",
   "1000102": "Super Wizard Tower",
+  "1000105": "Guardian Building",
+  "1000106": "Squad Barracks",
+  "1000107": "Spiky Tower",
+  "1000108": "Firecracker Tower",
   "4000000": "Barbarian",
   "4000001": "Archer",
   "4000002": "Goblin",
