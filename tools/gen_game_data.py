@@ -30,6 +30,8 @@ LAYOUT = {
 }
 # Only these new names are added; everything else new in the CSVs is internal/unused.
 NEW_NAMES_FROM = 1000105
+# Town Hall 19 Squad troops (made at the Squad Barracks, upgraded in the Laboratory).
+NEW_TROOPS = set(range(4000195, 4000207))
 
 
 def num(row, ix, col):
@@ -74,11 +76,11 @@ def main(src):
                     added += 0 if str(level) in old else 1
                     times.setdefault(str(k), {})[str(level)] = t
                     old = times[str(k)]
-        if f == "buildings":
-            for k, n in name.items():
-                if k >= NEW_NAMES_FROM and str(k) not in nj["names"]:
-                    nj["names"][str(k)] = n
-                    print("new building name:", k, n)
+        for k, n in name.items():
+            wanted = (f == "buildings" and k >= NEW_NAMES_FROM) or (f == "characters" and k in NEW_TROOPS)
+            if wanted and str(k) not in nj["names"]:
+                nj["names"][str(k)] = n
+                print("new name:", k, n)
     tj["times"] = {k: {l: v for l, v in sorted(times[k].items(), key=lambda x: int(x[0]))}
                    for k in sorted(times, key=int)}
     tj["source"] = "game logic CSVs (Town Hall 19) + clash-of-clans-data@0.19.1"

@@ -44,3 +44,7 @@ signing/
 *.jks
 *.keystore
 keystore.properties
+
+# Python caches
+__pycache__/
+*.pyc
