@@ -24,12 +24,12 @@ A Material You home screen widget for Android that shows your Clash of Clans bui
   <tr>
     <td width="33%" valign="top"><img src="docs/screenshots/full-size.png" alt="The full-size widget with every section and the helper reset time in the footer" width="100%"></td>
     <td width="33%" valign="top"><img src="docs/screenshots/builder-base.png" alt="The Builder Base widget: builders, Star Laboratory and Clock Tower" width="100%"></td>
-    <td></td>
+    <td width="33%" valign="top"><img src="docs/screenshots/account-picker.png" alt="The screen shown when you place a widget: pick an account and its name" width="100%"></td>
   </tr>
   <tr>
     <td align="center">Full size</td>
     <td align="center">Builder Base</td>
-    <td></td>
+    <td align="center">Pick the account when you add a widget</td>
   </tr>
 </table>
 
