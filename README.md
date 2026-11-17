@@ -10,28 +10,11 @@ A Material You home screen widget for Android that shows your Clash of Clans bui
 
 ## Screenshots
 
-<table>
-  <tr>
-    <td width="33%"><img src="docs/screenshots/widget.png" alt="The widget with builders, the lab with the Goblin Researcher and the pet house" width="100%"></td>
-    <td width="33%"><img src="docs/screenshots/widget-potion.png" alt="The same widget with a Builder Potion running: the potion button shows the time left and the countdowns are shorter" width="100%"></td>
-    <td width="33%"><img src="docs/screenshots/second-account.png" alt="A second account on its own widget, with its own name" width="100%"></td>
-  </tr>
-  <tr>
-    <td align="center">Widget</td>
-    <td align="center">With a Builder Potion running</td>
-    <td align="center">A second account</td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top"><img src="docs/screenshots/full-size.png" alt="The full-size widget with every section and the helper reset time in the footer" width="100%"></td>
-    <td width="33%" valign="top"><img src="docs/screenshots/builder-base.png" alt="The Builder Base widget: builders, Star Laboratory and Clock Tower" width="100%"></td>
-    <td width="33%" valign="top"><img src="docs/screenshots/account-picker.png" alt="The screen shown when you place a widget: pick an account and its name" width="100%"></td>
-  </tr>
-  <tr>
-    <td align="center">Full size</td>
-    <td align="center">Builder Base</td>
-    <td align="center">Pick the account when you add a widget</td>
-  </tr>
-</table>
+<p align="center">
+  <img src="docs/screenshots/overview.png" alt="Clash Timer widgets: the normal widget, one with a Builder Potion running, a second account, the full-size widget, the Builder Base widget and the account picker" width="100%">
+</p>
+
+<p align="center"><sub>Top: the widget, with a Builder Potion running, and a second account. Bottom: full size, the Builder Base widget and the account picker shown when you add a widget.</sub></p>
 
 ## Features
 
