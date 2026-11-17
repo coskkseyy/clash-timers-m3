@@ -2,7 +2,7 @@
 
 Thanks for helping out. Bug reports, new game IDs and small fixes are all welcome.
 
-- **Bugs:** use the [bug report template](https://github.com/Kuswaa/clash-timers/issues/new/choose) and include the crash report from the app if there is one.
+- **Bugs:** use the [bug report template](https://github.com/coskkseyy/clash-timers-m3/issues/new/choose) and include the crash report from the app if there is one.
 - **Larger changes:** open an issue first, so we can agree on the approach before you spend time on it.
 - **Tests:** run `./gradlew :app:testDebugUnitTest` before opening a pull request, and add tests for changes to the parser or the timer engine.
 
