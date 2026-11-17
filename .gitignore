@@ -38,3 +38,9 @@ releases/
 /tools/retrace.sh
 /tools/icon_sheet.html
 /tools/icons_missing.txt
+
+# Signing keys never go in the repo (CI reads them from repository secrets)
+signing/
+*.jks
+*.keystore
+keystore.properties

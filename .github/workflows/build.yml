@@ -24,8 +24,21 @@ jobs:
       - name: Unit tests
         run: ./gradlew :app:testDebugUnitTest
 
+      # The signing key lives in repository secrets, never in the repo:
+      #   KEYSTORE_B64   = base64 of the .jks file
+      #   KEYSTORE_PROPS = the keystore.properties text (storePassword, keyAlias, keyPassword)
+      - name: Restore signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PROPS: ${{ secrets.KEYSTORE_PROPS }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/sign"
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/sign/release.jks"
+          printf '%s\n' "$KEYSTORE_PROPS" | grep -v '^storeFile=' > "$RUNNER_TEMP/sign/keystore.properties"
+          echo "storeFile=$RUNNER_TEMP/sign/release.jks" >> "$RUNNER_TEMP/sign/keystore.properties"
+
       - name: Build signed release APK
-        run: ./gradlew assembleRelease -PclashtimersSigning=$GITHUB_WORKSPACE/signing/keystore.properties
+        run: ./gradlew assembleRelease -PclashtimersSigning=$RUNNER_TEMP/sign/keystore.properties
 
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk ClashTimer.apk
