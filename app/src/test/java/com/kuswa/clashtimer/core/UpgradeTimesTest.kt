@@ -17,6 +17,8 @@ class UpgradeTimesTest {
         assertEquals(1123200L, times.timeTo(107000008, 5)) // Logger → 5: 13d (guardian)
         assertEquals(288000L, times.timeTo(102000040, 8)) // Cake-A-Pult Damage module → 8
         assertEquals(993600L, times.timeTo(4000008, 13)) // Dragon → 13: 11d 12h (TH19 times)
+        assertEquals(432000L, times.timeTo(107000001, 2)) // Smasher → 2: 5d (TH19 times)
+        assertEquals(1209600L, times.timeTo(107000001, 10)) // Smasher → 10: 14d
         // Supercharge levels restart at 1 in the data; only the normal track is kept.
         assertEquals(43200L, times.timeTo(1000027, 1))
         assertNull(times.timeTo(1000027, 99))
