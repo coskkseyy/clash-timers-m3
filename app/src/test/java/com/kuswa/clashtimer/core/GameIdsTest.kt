@@ -10,4 +10,11 @@ class GameIdsTest {
         assertNull(GameIds.olderArt(GameIds.CLAN_CASTLE, 15))
         assertNull(GameIds.olderArt(GameIds.TOWN_HALL, 14))
     }
+
+    @Test fun squadBarracksUsesItsLevelArt() {
+        assertEquals(100010601, GameIds.olderArt(GameIds.SQUAD_BARRACKS, 1))
+        assertEquals(100010612, GameIds.olderArt(GameIds.SQUAD_BARRACKS, 12))
+        assertEquals(100010701, GameIds.olderArt(GameIds.SPIKY_TOWER, 1))
+        assertNull(GameIds.olderArt(GameIds.SQUAD_BARRACKS, 13))
+    }
 }

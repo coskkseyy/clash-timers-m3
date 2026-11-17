@@ -4,12 +4,22 @@ package com.kuswa.clashtimer.core
 object GameIds {
     const val TOWN_HALL = 1000001
     const val CLAN_CASTLE = 1000014
+    const val SQUAD_BARRACKS = 1000106
+    const val SPIKY_TOWER = 1000107
+    const val FIRECRACKER_TOWER = 1000108
     /** icons/91000014.webp: the Clan Castle as it looks up to level 14 (Town Hall 19 changed the art at 15). */
     private const val CLAN_CASTLE_OLD_ART = 91000014
 
-    /** Icon id for the look a building had before its newest art, or null when the main icon fits. */
-    fun olderArt(dataId: Int, targetLevel: Int): Int? =
-        if (dataId == CLAN_CASTLE && targetLevel < 15) CLAN_CASTLE_OLD_ART else null
+    /**
+     * Icon id for the look a building has at [targetLevel] when we have per-level art for it, else null
+     * (the main icon is the newest look). Squad Barracks has art for every level: icons/<dataId*100+level>.webp.
+     */
+    fun olderArt(dataId: Int, targetLevel: Int): Int? = when {
+        dataId == CLAN_CASTLE && targetLevel < 15 -> CLAN_CASTLE_OLD_ART
+        dataId == SQUAD_BARRACKS && targetLevel in 1..12 -> dataId * 100 + targetLevel
+        (dataId == SPIKY_TOWER || dataId == FIRECRACKER_TOWER) && targetLevel in 1..2 -> dataId * 100 + targetLevel
+        else -> null
+    }
     const val BUILDERS_HUT = 1000015
     const val BOBS_HUT = 1000064
 
