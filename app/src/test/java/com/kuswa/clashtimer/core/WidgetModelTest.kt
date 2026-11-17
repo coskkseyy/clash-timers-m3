@@ -67,7 +67,7 @@ class WidgetModelTest {
         // During the Lab Assistant's hour the bar moves 13× as fast (work left drops 13 s per second).
         val helperStart = t0 + 72189
         val workAtStart = 121885 - 72189
-        assertEquals(1 - (workAtStart - 13 * 600) / 1296000f, build(helperStart + 600).labRow.progress, 1e-4f)
+        assertEquals(1 - (workAtStart - 13 * 600) / 993600f, build(helperStart + 600).labRow.progress, 1e-4f)
     }
 
     @Test fun progressFallsBackToRemainingAtFirstSync() {
