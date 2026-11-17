@@ -182,7 +182,7 @@ object WidgetModelBuilder {
                 name = title,
                 levelText = if (job.isNewBuilding) Lang.t("(new)", "(yeni)") else job.targetLevel.toString(),
                 showArrow = !job.isNewBuilding,
-                iconIds = listOfNotNull(job.dataId, job.typeDataId, job.parentDataId).distinct(),
+                iconIds = listOfNotNull(GameIds.olderArt(job.dataId, job.targetLevel), job.dataId, job.typeDataId, job.parentDataId).distinct(),
                 initials = initials(title),
                 finishAt = finishAt,
                 remaining = if (done) 0 else finishAt - now,
