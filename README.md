@@ -8,6 +8,22 @@ A Material You home screen widget for Android that shows your Clash of Clans bui
 
 > This is an unofficial fan project and is not endorsed by Supercell. See the [disclaimer](#disclaimer).
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/widget.png" alt="The widget with builders, the lab with the Goblin Researcher and the pet house" width="300">
+  &nbsp;
+  <img src="docs/screenshots/widget-potion.png" alt="The same widget with a Builder Potion running: the potion button shows the time left and the countdowns are shorter" width="300">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/second-account.png" alt="A second account on its own widget, with its own name" width="300">
+  &nbsp;
+  <img src="docs/screenshots/full-size.png" alt="The full-size widget with every section and the helper reset time in the footer" width="300">
+  &nbsp;
+  <img src="docs/screenshots/builder-base.png" alt="The Builder Base widget: builders, Star Laboratory and Clock Tower" width="300">
+</p>
+
 ## Features
 
 - **Every timer in one widget:** all your builders, the Goblin Builder, the laboratory with the Goblin Researcher, and the pet house, with progress bars and icons.
