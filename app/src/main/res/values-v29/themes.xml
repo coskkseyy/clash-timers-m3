@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The config screen picks light/dark itself (Compose); the system's force-dark must not invert it a second time. -->
+    <style name="Theme.ClashTimer.Config" parent="Theme.ClashTimer">
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

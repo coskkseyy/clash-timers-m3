@@ -2,6 +2,7 @@
 <resources>
 
     <style name="Theme.ClashTimer" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.ClashTimer.Config" parent="Theme.ClashTimer" />
 
     <!-- SyncActivity: invisible, no window animation, so tapping Sync looks like nothing opened. -->
     <style name="Theme.ClashTimer.Invisible" parent="android:Theme.Translucent.NoTitleBar">
