@@ -10,19 +10,28 @@ A Material You home screen widget for Android that shows your Clash of Clans bui
 
 ## Screenshots
 
-<p align="center">
-  <img src="docs/screenshots/widget.png" alt="The widget with builders, the lab with the Goblin Researcher and the pet house" width="300">
-  &nbsp;
-  <img src="docs/screenshots/widget-potion.png" alt="The same widget with a Builder Potion running: the potion button shows the time left and the countdowns are shorter" width="300">
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/second-account.png" alt="A second account on its own widget, with its own name" width="300">
-  &nbsp;
-  <img src="docs/screenshots/full-size.png" alt="The full-size widget with every section and the helper reset time in the footer" width="300">
-  &nbsp;
-  <img src="docs/screenshots/builder-base.png" alt="The Builder Base widget: builders, Star Laboratory and Clock Tower" width="300">
-</p>
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/widget.png" alt="The widget with builders, the lab with the Goblin Researcher and the pet house" width="100%"></td>
+    <td width="33%"><img src="docs/screenshots/widget-potion.png" alt="The same widget with a Builder Potion running: the potion button shows the time left and the countdowns are shorter" width="100%"></td>
+    <td width="33%"><img src="docs/screenshots/second-account.png" alt="A second account on its own widget, with its own name" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center">Widget</td>
+    <td align="center">With a Builder Potion running</td>
+    <td align="center">A second account</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><img src="docs/screenshots/full-size.png" alt="The full-size widget with every section and the helper reset time in the footer" width="100%"></td>
+    <td width="33%" valign="top"><img src="docs/screenshots/builder-base.png" alt="The Builder Base widget: builders, Star Laboratory and Clock Tower" width="100%"></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="center">Full size</td>
+    <td align="center">Builder Base</td>
+    <td></td>
+  </tr>
+</table>
 
 ## Features
 
