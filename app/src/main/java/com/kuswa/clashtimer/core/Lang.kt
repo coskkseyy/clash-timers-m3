@@ -20,8 +20,8 @@ object Lang {
 
     fun t(en: String, tr: String): String = if (this.tr) tr else en
 
-    // Duration units: 1d 20h 5m / 1g 20s 5dk.
+    // Duration units: 1d 20h 5m / 1g 20sa 5dk.
     val d: String get() = t("d", "g")
-    val h: String get() = t("h", "s")
+    val h: String get() = t("h", "sa")
     val m: String get() = t("m", "dk")
 }

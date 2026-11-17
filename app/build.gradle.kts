@@ -30,8 +30,8 @@ android {
         minSdk = 26
         targetSdk = 37
         // Bump both for every release; a lower versionCode can't install over a higher one.
-        versionCode = 3
-        versionName = "1.0.2-material"
+        versionCode = 4
+        versionName = "1.1.0-material"
         // Shown in crash reports (crash/CrashReporter.kt). R8 is off in every build (see release below).
         manifestPlaceholders["r8"] = "off"
 

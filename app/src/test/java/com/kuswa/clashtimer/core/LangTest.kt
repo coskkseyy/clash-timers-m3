@@ -9,7 +9,7 @@ class LangTest {
 
     @Test fun turkishDurations() {
         Lang.apply(AppSettings(language = "tr"))
-        assertEquals("1g 2s", WidgetModelBuilder.formatRemaining(26L * 3600))
+        assertEquals("1g 2sa", WidgetModelBuilder.formatRemaining(26L * 3600))
         assertEquals("5dk önce", WidgetModelBuilder.formatAgo(300))
     }
 
